@@ -1,0 +1,17 @@
+{
+    "name": "cognos.node",
+    "version": "1.0.0",
+    "description": "A Node.js app with Puppeteer and Cypress for browser-based testing.",
+    "scripts": {
+        "test": "echo \"Error: no test has been specified\"",
+        "test:headless": "puppeteer test-script.js",
+        "test:e2e": "cypress open"
+    },
+    "devDependencies": {
+        "puppeteer": "^15.0.0",
+        "cypress": "^10.0.0"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

@@ -1,0 +1,19 @@
+<Configuration>
+    <vGPU>Enable</vGPU>
+    <Networking>Default</Networking>
+    <AudioInput>Enable</AudioInput>
+    <VideoInput>Disable</VideoInput>
+    <PrinterRedirection>Disable</PrinterRedirection>
+    <ClipboardRedirection>Default</ClipboardRedirection>
+    <ProtectedClient>Disable</ProtectedClient>
+    <MappedFolders>
+        <MappedFolder>
+            <HostFolder>C:\Users\tp\wsb</HostFolder>
+            <SandboxFolder>C:\Users\WDAGUtilityAccount\wsb</SandboxFolder>
+            <ReadOnly>false</ReadOnly>
+        </MappedFolder>
+    </MappedFolders>
+    <LogonCommand>
+        <Command>powershell.exe -ExecutionPolicy Bypass -File C:\Users\WDAGUtilityAccount\wsb\shell.ps1</Command>
+    </LogonCommand>
+</Configuration>

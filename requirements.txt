@@ -1,0 +1,9 @@
+python-dotenv
+jax
+jupyter
+ipykernel
+openai
+numpy
+pandas
+typing
+pydantic
