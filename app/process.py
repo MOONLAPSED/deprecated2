@@ -1,3 +1,5 @@
+import re
+
 def process_custom_syntax(input_text, context={}):
     # Split input into tokens
     tokens = input_text.split()
@@ -42,3 +44,28 @@ context = {
 
 result = process_custom_syntax(custom_syntax, context)
 print(f"{result}")
+
+  # Outputs: This is a custom example text with some placeholders.
+
+class CustomSyntax:
+    def __init__(self):
+        self.var_regex = re.compile(r"\{\{([\w]+)\}\}")
+
+    def process(self, text, context):
+        def var_replace(match):
+            var_name = match.group(1)
+            if var_name in context:
+                return context[var_name]
+            return match.group(0)
+        
+        return self.var_regex.sub(var_replace, text)
+
+processor = CustomSyntax()
+
+text = "This has a {{var1}} and a {{var2}} variable."
+context = {"var1": "first", "var2": "second"}
+
+result = processor.process(text, context)
+print(result)
+
+# Outputs: This has a first and a second variable.
