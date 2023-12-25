@@ -14,6 +14,7 @@ class Frame:
     HEADER_RESPONSE = b'02'
     TYPES = (HEADER_REQUEST, HEADER_RESPONSE)
     HeaderType = bytes
+    print(HEADER_REQUEST)
     assert len(HEADER_REQUEST) == 1
 
     def __init__(self, header: HeaderType, payload: bytes):
