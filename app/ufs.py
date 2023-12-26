@@ -1,5 +1,6 @@
 import typer
 import sys
+import os
 from typing import Optional
 
 app = typer.Typer()
@@ -113,3 +114,47 @@ class UnixFilesystem:
 
 if __name__ == "__main__":
     app()  # Execute the Typer app
+
+
+class UFX:
+
+  def __init__(self, fd=None, inode=0, pid=os.getpid(), ...):
+    self.fd = fd
+    self.inode = inode 
+    self.pid = pid
+
+  @property
+  def inode(self):
+    if not self._inode:
+      self._inode = os.fstat(self.fd).st_ino
+    return self._inode
+
+  @inode.setter
+  def inode(self, inode):
+    self._inode = inode
+
+  @property
+  def pid(self):
+    return self._pid
+  
+  @pid.setter
+  def pid(self, pid):
+    self._pid = pid
+
+  # Other fields...
+
+  def read(self, length):
+    return os.read(self.fd, length)
+  
+  def write(self, data):  
+    return os.write(self.fd, data)
+
+# Usage
+
+fs = UFX(fd=open('file.txt'))
+print(fs.inode) # prints inode of opened file
+print(fs.pid) # pid of current process
+
+fs.write('hello')
+
+
