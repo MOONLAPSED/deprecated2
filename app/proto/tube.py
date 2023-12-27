@@ -92,3 +92,9 @@ async def Pipe_Tube_Client():
                         pipe.write(data)
         except Exception as e:
             print(f"Pipe_Tube_Client: {e}")
+
+
+# pipe tube FD file descriptor
+            # pipe_fd = os.pipe()
+            # fcntl.fcntl(pipe_fd[0], fcntl.F_SETFL, os.O_NONBLOCK)
+            
