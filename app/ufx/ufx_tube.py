@@ -100,5 +100,3 @@ class UFX:
 # Example usage
 stats = TextStats()
 fs = UFX(fd=open('file.txt'))
-
-# Utilize the functionalities of TextStats and UFX classes as needed within your application
