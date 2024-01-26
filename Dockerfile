@@ -11,8 +11,7 @@ RUN apt-get update && \
     pip install -r requirements.txt
 # DEBIAN_FRONTEND=noninteractive environment variable is set to prevent interactive prompts during package installations.
 
-# ENTRYPOINT ["python3", "main.py"]
-
 ENTRYPOINT ["jupyter", "notebook", "--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]
-# docker build . -t jpt
+# docker run --name cognos -it -d -p 8080:80 cognos:latest
+
 # docker run -d -p 8888:8888 jpt:latest
