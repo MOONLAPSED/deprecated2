@@ -9,7 +9,7 @@
     },
     "devDependencies": {
         "puppeteer": "^21.9.0",
-        "cypress": "^10.0.0"
+        "cypress": "^13.6.3"
     },
     "engines": {
         "node": ">=14.0.0"
