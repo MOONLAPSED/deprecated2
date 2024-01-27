@@ -45,10 +45,6 @@ def init_logging():
     root_logger = logging.getLogger()   
     sub_logger = logging.getLogger('sub')
 
-    root_logger.info("Root logger")  
-    sub_logger.info("Sub logger")
-
-
     @dataclass(frozen=True)
     class LogBase(ABC):
         name: str = None
