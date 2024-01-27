@@ -1,19 +1,5 @@
 import logging
-from logging.handlers import RotatingFileHandler 
 from logging.config import dictConfig
-from dataclasses import dataclass
-from abc import ABC, abstractmethod
-
-@dataclass(frozen=True)
-class LogBase(ABC):
-    name: str = None
-    propagate: bool = True
-    
-    logger: logging.Logger = None
-
-    def should_propagate(self, level):
-        return self.propagate and level >= self.level
-
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,   
@@ -46,7 +32,14 @@ LOGGING_CONFIG = {
 }
 
 def init_logging():
-   
+    import sys
+    import os
+    from logging.handlers import RotatingFileHandler 
+    from dataclasses import dataclass
+    from abc import ABC, abstractmethod
+    sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+
+    
     logging.config.dictConfig(LOGGING_CONFIG)  
 
     root_logger = logging.getLogger()   
@@ -55,6 +48,16 @@ def init_logging():
     root_logger.info("Root logger")  
     sub_logger.info("Sub logger")
 
+
+    @dataclass(frozen=True)
+    class LogBase(ABC):
+        name: str = None
+        propagate: bool = True
+        
+        logger: logging.Logger = None
+
+        def should_propagate(self, level):
+            return self.propagate and level >= self.level
     return root_logger, sub_logger
 
-root, sub = init_logging()
+# root, sub = init_logging()
