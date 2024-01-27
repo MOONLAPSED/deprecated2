@@ -1,15 +1,24 @@
 #! /usr/bin/env python3
-import logging, logging.config
+import logging
+import logging.config
 import sys
 
-def main():  # Define the logging configuration
+def main():
+    """
+    Main function that configures logging and demonstrates custom application-specific logging methods.
+
+    This function sets up the logging configuration, creates a logger, and extends the logger class
+    to support custom application-specific logging methods. It then demonstrates the usage of these
+    custom methods by logging an error and a critical message.
+
+    """
     LOGGING_CONFIG = {
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
             'default': {
                 'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-                'datefmt': '%Y-%m-%d %H:%M:%S'
+                'datefmt': '%z- %Y-%m-%d %H:%M:%S'
             },
         },
         'handlers': {
@@ -20,15 +29,47 @@ def main():  # Define the logging configuration
                 'stream': sys.stdout
             },
         },
+        'file': {
+            'level': logging.getLevelName('default'),
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': 'app.log',
+            'maxBytes': 10485760,
+            'backupCount': 10
+        },
         'root': {
             'handlers': ['console'],
             'level': logging.INFO,
             'propagate': True
+        },
+        'ERROR': {
+            'handlers': ['console', 'file'],
+            'level': logging.ERROR,
+            'propagate': False
+        },
+        'CRITICAL': {
+            'handlers': ['console', 'file'],
+            'level': logging.CRITICAL,
+            'propagate': False
+        },
+        'LEVEL001': {
+            'handlers': ['console', 'file'],
+            'level': logging.DEBUG,
+            'propagate': False
+        },
+        'LEVEL200': {
+            'handlers': ['console', 'file'],
+            'level': logging.DEBUG,
+            'propagate': False
+        },
+        'LEVELXYZ': {
+            'handlers': ['console', 'file'],
+            'level': logging.DEBUG,
+            'propagate': False
         }
     }
 
-    # Mutate the basicConfig
-    logging.config.dictConfig(LOGGING_CONFIG)
+    logging.config.dictConfig(LOGGING_CONFIG)  # Mutate the basicConfig
     
     # Create a logger
     logger = logging.getLogger(__name__)
@@ -63,5 +104,16 @@ def main():  # Define the logging configuration
     logger.custom_error("This is an error message")
     logger.custom_critical("This is a critical message")
 
+    # logging.handlers.TimedRotatingFileHandler.level = 100
+
+    def print_logging_levels():
+        for level in range(0, 200):
+            for e in ['CRITICAL', 'ERROR']:
+                if e in logging.getLevelName(level):
+                    print(f"Level {level} is {logging.getLevelName(level)}")
+
+    print_logging_levels()
+
 if __name__ == "__main__":
     main()
+
