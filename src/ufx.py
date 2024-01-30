@@ -5,7 +5,7 @@ import os
 import shutil
 
 # Define the constant limits
-limit = 10  # Arbitrary limit for iterations
+limit = 10  # Arbitrary limit for iterations and permutations (loops, dfs, bfs, etc.)
 llimit = 10 * 1000000  # 10 MB file size limit
 
 def copy(src, dst):
@@ -69,7 +69,6 @@ def get_directory_size(directory):
             filepath = os.path.join(dirpath, filename)
             total_size += os.path.getsize(filepath)
     return total_size
-
 
 
 class SerializationInterface(ABC):

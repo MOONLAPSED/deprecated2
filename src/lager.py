@@ -38,23 +38,12 @@ LOGGING_CONFIG = {
 }
 # Note: The msg is the message format string, and the args are the arguments which are merged into msg using the string formatting operator. (Note that this means that you can use keywords in the format string, together with a single dictionary argument.) No % formatting operation is performed on msg when no args are supplied.
 def init_logging():
-    sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '.'))
-
     
     logging.config.dictConfig(LOGGING_CONFIG)  
 
     root_logger = logging.getLogger()   
     sub_logger = logging.getLogger('branch')
 
-    @dataclass(frozen=True)
-    class LogBase(ABC):
-        name: str = None
-        propagate: bool = True
-        
-        logger: logging.Logger = None
-
-        def should_propagate(self, level):
-            return self.propagate and level >= self.level
     return root_logger, sub_logger
 # if propagate is True: Messages are passed directly to the ancestor loggers’ handlers - neither the level nor filters of the ancestor loggers in question are considered.
 # The term ‘delegation to the parent’ means that if a logger has a level of NOTSET, its chain of ancestor loggers is traversed until either an ancestor with a level other than NOTSET is found, or the root is reached.

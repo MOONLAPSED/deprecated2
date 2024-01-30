@@ -17,3 +17,5 @@
         <Command>powershell.exe -ExecutionPolicy Bypass -File C:\Users\WDAGUtilityAccount\wsb\shell.ps1</Command>
     </LogonCommand>
 </Configuration>
+
+# https://github.com/microsoft/WinAppDriver
