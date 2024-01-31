@@ -37,6 +37,7 @@ if __name__ == "__main__":
     (lambda: (
         leaf.setLevel(30),
         leaf.info("This is an info message."),
+        leaf.warning("This is a warning message."),
         print(f"leaf set to {leaf.level}"),
         leaf.setLevel(0)
     ))()
