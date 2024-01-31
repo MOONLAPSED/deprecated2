@@ -44,3 +44,6 @@ def init_logging():
     sub_logger = logging.getLogger('branch')
 
     return root_logger, sub_logger
+
+def logger_factory(logger_name: str = '{__name__}'):
+    return logging.getLogger(logger_name)
