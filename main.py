@@ -33,4 +33,12 @@ if __name__ == "__main__":
     main()
     sub()
     leaf = src.lager.logger_factory('leaf')
-    leaf.info("Application conclueded.")
+    print(f"leaf set to {leaf.level}")
+    (lambda: (
+        leaf.setLevel(30),
+        leaf.info("This is an info message."),
+        print(f"leaf set to {leaf.level}"),
+        leaf.setLevel(0)
+    ))()
+    print(f"leaf set to {leaf.level}")
+    leaf.info("Application concluded.")
