@@ -2,11 +2,15 @@
 # /src/ufx.py - define the ABCs for the UnixFilesystem and its interfaces and methods as well as core dataclasses.
 from abc import *
 import os
+import re
+import sys
 import shutil
-
+import subprocess
 # Define the constant limits
 limit = 10  # Arbitrary limit for iterations and permutations (loops, dfs, bfs, etc.)
 llimit = 10 * 1000000  # 10 MB file size limit
+
+from collections import deque
 
 def copy(src, dst):
     total_size = 0  # Variable to track the total size of copied files
@@ -96,3 +100,40 @@ class JsonSerializer(SerializationInterface):
 # Create an instance of JsonSerializer directly
 serializer = JsonSerializer()
 print(serializer.serialize())
+
+
+
+
+
+def call(self, cmd, **kwargs):
+    """
+    In this code snippet, a method called `call()` is defined inside a class. The method takes three arguments - cmd (command), **kwargs (keywords arguments), and an optional `expect` argument containing a list of dictionaries with keys "return_codes", "stdout", and "stderr".
+
+    The main goal of the `call()` function is to execute the command specified in the 'cmd' argument. It does this by creating a subprocess using `subprocess.Popen` and passing in the appropriate keyword arguments such as stdin, stdout, and stderr based on the given kwargs.
+
+    After executing the command, the function collects the output (stdout and stderr) from the subprocess and assigns it to 'out' and 'err' variables. It also captures the return code of the executed command using `process.poll()`. The `return_code` variable stores this value.
+
+    The `match()` function is used to check if the expected output matches with the actual output. For this, it compares the given return codes, stdout and stderr against the values provided in the 'expect' dictionary. If all conditions are met, the function returns True, else False.
+
+    Finally, if the command execution fails (i.e., any of the conditions in `match()` is not met), an exception (`subprocess.CalledProcessError`) is raised with appropriate error messages and return code. Otherwise, a `SubprocessResult` object is returned containing the output, stderr, and return code from the executed command.
+    """
+    print('Running "{}"'.format(cmd), file=sys.stderr)
+    expect = kwargs.pop("expect", [dict(return_codes=[os.EX_OK], stdout=None, stderr=None)])
+    process = subprocess.Popen(cmd, stdin=kwargs.get("stdin", subprocess.PIPE), stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, **kwargs)
+    out, err = process.communicate()
+    return_code = process.poll()
+    out = out.decode(sys.stdin.encoding)
+    err = err.decode(sys.stdin.encoding)
+
+    def match(return_code, out, err, expected):
+        exit_ok = return_code in expected["return_codes"]
+        stdout_ok = re.search(expected.get("stdout") or "", out)
+        stderr_ok = re.search(expected.get("stderr") or "", err)
+        return exit_ok and stdout_ok and stderr_ok
+    if not any(match(return_code, out, err, exp) for exp in expect):
+        print(err)
+        e = subprocess.CalledProcessError(return_code, cmd, output=out)
+        e.stdout, e.stderr = out, err
+        raise e
+    return self.SubprocessResult(out, err, return_code) 

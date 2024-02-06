@@ -83,8 +83,19 @@ alias la='ls -A --color=auto'
 alias l='ls -CF --color=auto'
 alias ..='../'
 # alias cr='history | grep <search_term>' # see (reverse-i-search)`' == "ctrl+r" below
-
-
+# Git Aliases
+alias gs='git status'
+alias gca='git commit -a'
+alias gcam='git commit -am'
+alias gp='git push'
+alias gup='git pull'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gl='git log --graph --oneline --decorate --all'
+alias gll='git log -1 --stat'
+alias gclean='git clean -fdX'
+alias 'git diff'='git diff --color-words'
+alias 'git dif'='git diff --color --word-diff --stat'
 
 # ==========================================================
 # Custom Functions
