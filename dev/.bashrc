@@ -94,8 +94,8 @@ alias gcb='git checkout -b'
 alias gl='git log --graph --oneline --decorate --all'
 alias gll='git log -1 --stat'
 alias gclean='git clean -fdX'
-alias 'git diff'='git diff --color-words'
-alias 'git dif'='git diff --color --word-diff --stat'
+alias diff='git diff --color-words'
+alias dif='git diff --color --word-diff --stat'
 
 # ==========================================================
 # Custom Functions
@@ -179,8 +179,6 @@ popx() {
 }
 # Validates <num> is greater than 0, Loops <num> times popping off the stack with popd, prints pwd
 
-
-
 # ----------------------------------------------------
 # (reverse-i-search)`' == "ctrl+r"
 # to expand the functionality use: `history | grep <search_term>`
@@ -223,4 +221,3 @@ export PATH=$PATH:$HOME/.go/go/bin
 # ==========================================================
 # End of Custom Bash Configurations
 # ==========================================================
-
