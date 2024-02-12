@@ -1,45 +1,31 @@
 #! /usr/bin/env python3
 # main.py
-
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '.'))
+from logging import config as logging
+from src.lager import *
 
-import src.lager
 
 def main():
-    logger, _ = src.lager.init_logging()
     try:
-        logger.info("Application initialized.")
-    except NameError:
-        print("Logger not defined")
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))  # is there adequate permission to expand the path?
+    except Exception as e:
+        print(e)
     finally:
-        # print(f"finishing main with logger {logger}")
-        pass
-    return logger, _
+        sys.path.extend([
+            os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')),
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), '.'),
+            os.path.abspath(os.path.dirname(__file__))
+        ])
 
-def sub():
-    _, sub_logger = src.lager.init_logging()
-    try:
-        sub_logger.info("Application in-progress.")
-    except NameError:
-        print("Logger not defined")
-    finally:
-        # print(f"finishing sub with logger {sub_logger}")
-        pass
-    return _, sub_logger
+        return 0
 
 if __name__ == "__main__":
-    main()
-    sub()
-    leaf = src.lager.logger_factory('leaf')
-    print(f"leaf set to {leaf.level}")
-    (lambda: (
-        leaf.setLevel(30),
-        leaf.info("This is an info message."),
-        leaf.warning("This is a warning message."),
-        print(f"leaf set to {leaf.level}"),
-        leaf.setLevel(0)
-    ))()
-    print(f"leaf set to {leaf.level}")
-    leaf.info("Application concluded.")
+    try:
+        logging.config.dictConfig(LOGGING_CONFIG)
+        logger = logging.getLogger('applog')
+        logger.info("main.py is running")
+    except ImportError:
+        print("src not found, try reinstalling the package")
+    finally:
+        main()
