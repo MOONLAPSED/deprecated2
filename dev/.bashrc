@@ -100,7 +100,7 @@ alias dif='git diff --color --word-diff --stat'
 # ==========================================================
 # Custom Functions
 # ==========================================================
-
+git config --global rerere.enabled true
 # Reverse search through command history
 cr() {
   if [ $# -eq 0 ]; then
