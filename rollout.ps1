@@ -29,7 +29,8 @@
     Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     Start-Process "notepad.exe"
     Start-Process "explorer.exe"
-
-    # Invoke post.ps1 for further setup
-    Invoke-Expression -Command "$desktop\dev\post.ps1" 
-        
+    try {
+        Start-Process "wt.exe" -Wait
+    } catch {
+        Start-Process "powershell.exe" 
+    }
