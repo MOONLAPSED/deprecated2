@@ -8,7 +8,7 @@
         "test:e2e": "cypress open"
     },
     "devDependencies": {
-        "puppeteer": "^21.9.0",
+        "puppeteer": "^22.0.0",
         "cypress": "^13.6.3"
     },
     "engines": {
