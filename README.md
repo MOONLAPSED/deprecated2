@@ -9,6 +9,7 @@ The devenv contains:
  - VScode
  - Etc.
 
+click or invoke the .wsb then wait for the sandbox to load and click boxy.bat on the desktop. Wait until it completes then click on boxy2.bat.
 
 ### docker & jupyter-python:
 
