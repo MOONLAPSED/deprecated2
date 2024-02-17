@@ -1,20 +1,7 @@
-$LOG_FILE = "C:\path\to\log.txt"
-
-# Check if a command has already been run
-function IsCommandInstalled($command) {
-    $logContent = Get-Content -Path $LOG_FILE -ErrorAction SilentlyContinue
-    return $logContent -match $command
-}
-
-# Run a command without logging the installation status
+# Run a command
 function RunCommand($command) {
-    if (IsCommandInstalled($command)) {
-        Write-Host "Command '$command' has already been run."
-    }
-    else {
-        Write-Host "Running command: $command"
-        Invoke-Expression $command
-    }
+    Write-Host "Running command: $command"
+    Invoke-Expression $command
 }
 
 # Run the commands
@@ -38,4 +25,4 @@ RunCommand("scoop install extras/x64dbg")
 RunCommand("scoop bucket add nerd-fonts")
 RunCommand("scoop install nerd-fonts/FiraMono-NF-Mono")
 RunCommand("scoop install nerd-fonts/FiraCode-NF")
-RunCommand("scoop install versions/googlechrome-canary > $LOG_FILE 2>&1")
+RunCommand("scoop install versions/googlechrome-canary")
