@@ -9,27 +9,33 @@ The devenv contains:
  - VScode
  - Etc.
 
+
+## instructions for wsb
+
+rename to your $PATH in cfg.wsb
+
 click or invoke the .wsb then wait for the sandbox to load and click boxy.bat on the desktop. Wait until it completes then click on boxy2.bat.
+
+open miniforge prompt and `conda activate base`, then `mamba create -n 3ten python=3.10`
 
 ### docker & jupyter-python:
 
 ENTRYPOINT ["jupyter", "notebook", "--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]
-# docker build . -t jpt
-# docker run -d -p 8888:8888 jpt:latest```
+
+> docker build . -t jpt
+
+> docker run -d -p 8888:8888 jpt:latest```
 
 http://127.0.0.1:8888/lab - jupyter lab (kernel select, file manager, etc)
 
 http://127.0.0.1:8888/tree? - files
 
-TODO: docker workflow:
 
-.sh script to be run by setup.py which git clones jupyter-python container image and repo (the repo itself is required)
+### /dev/diy/...
 
-j-p container image is naive and will be the 'runtime' for this application --> the .sh script above or the setup.py will need to 'pass' the program source code and any other data TO the container image.
-
-## LOGLEAF BRANCH: /dev/diy/...
 
 /dev/diy_llm_skim.py is meant to take diyllmdump.txt and transform it into output.md while removing all the undesired formatting. The undesired formatting is picked-up when preforming a 'ctrl+a' in the browser, in the chat-session.
+
 
 
 ```

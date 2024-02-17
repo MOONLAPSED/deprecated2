@@ -4,7 +4,6 @@
     scoop bucket add versions
     scoop bucket add extras
     scoop install versions/windows-terminal-preview
-    scoop install versions/vscode-insiders
     scoop install main/gh
     # scoop install main/winpython  # un-comment if you prefer over micromamba
 
