@@ -14,9 +14,9 @@ The devenv contains:
 
 rename to your $PATH in cfg.wsb
 
-click or invoke the .wsb then wait for the sandbox to load and click boxy.bat on the desktop. Wait until it completes then click on boxy2.bat.
+click or invoke the .wsb then wait for the sandbox to load and click boxy.bat on the desktop. If errors ensue: close the sandbox and re-open.
 
-open miniforge prompt and `conda activate base`, then `mamba create -n 3ten python=3.10`
+open miniforge prompt and `conda activate base`, then `mamba create -n 3ten python=3.10`, then `mamba init` before closing the terminal that opens automatically.
 
 ### docker & jupyter-python:
 
