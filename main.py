@@ -1,31 +1,43 @@
-#! /usr/bin/env python3
-# main.py
 import os
-import sys
-from logging import config as logging
-from src.lager import *
+import shutil
+from pathlib import Path
 
+def migrate_media(vault_path, media_dir=".media"):
+    """
+    Migrates linked media files in an Obsidian vault to a dedicated media directory.
 
-def main():
-    try:
-        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))  # is there adequate permission to expand the path?
-    except Exception as e:
-        print(e)
-    finally:
-        sys.path.extend([
-            os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')),
-            os.path.join(os.path.dirname(os.path.realpath(__file__)), '.'),
-            os.path.abspath(os.path.dirname(__file__))
-        ])
+    Args:
+        vault_path (str): Path to your Obsidian vault.
+        media_dir (str): Name of the media directory (relative to the vault).
+    """
 
-        return 0
+    media_path = Path(vault_path) / media_dir
+    media_path.mkdir(exist_ok=True)  # Create the media directory if needed
+
+    # Iterate over Markdown files in the vault
+    for md_file in vault_path.rglob("*.md"):
+        with md_file.open("r+") as f:  # Open in read/write mode
+            content = f.read()
+
+            # Find linked media files (adjust the pattern if needed)
+            for match in re.finditer(r"!\[\[(.*?)\]\]", content):
+                original_path = Path(vault_path) / match.group(1)
+                if original_path.exists():
+                    # Calculate new filename (add hashing, metadata if desired)
+                    new_filename = original_path.name 
+                    new_path = media_path / new_filename
+
+                    # Move the file
+                    shutil.move(original_path, new_path)
+
+                    # Update the link in the Markdown file
+                    new_link = f"![[{media_dir}/{new_filename}]]"
+                    content = content.replace(match.group(0), new_link)
+
+            f.seek(0)  # Reset file pointer
+            f.write(content)
+            f.truncate() 
 
 if __name__ == "__main__":
-    try:
-        logging.config.dictConfig(LOGGING_CONFIG)
-        logger = logging.getLogger('applog')
-        logger.info("main.py is running")
-    except ImportError:
-        print("src not found, try reinstalling the package")
-    finally:
-        main()
+    vault_path = input("Enter your Obsidian vault path: ")
+    migrate_media(vault_path)

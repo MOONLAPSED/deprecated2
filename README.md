@@ -1,47 +1,13 @@
 # cognOS by MOONLAPSED@github © MIT 2024
 
-### .wsb windows sandbox dev env
-A sandbox for developing open source LLM agentic software with degrees of computer(sandbox) control.
+cognOS, part of the cognosis project, is about creating a hyper interface for evolutionary cognitive algorithmic systems. There is an assumption inherint in the project that a neural network is a cognitive system. Unto itself, even, however in cohort with other cognitive systems, it is also a cognitive system. I believe this 'lambda calculus' of cognition is the most important aspect of the cognosis project -- how to create a cognitive system that can create other cognitive systems, read feedback, and attempt to generate behaviors based on that feedback? The assumption is that there IS some THING for this cognitive system to DO in any-given situation, and that it is the cognitive system's job to figure out what that THING is. Upon location of its head/parent it either orients itself within a cognitive system, or it creates a new cognitive system. 
 
-The devenv contains: 
+The system is easy enough to describe; a genetic algorithm that reencodes any type of data into a neural representation, the new neural representation is then used to create a new cognitive system which usually includes reencoding the data back into a format for the parent system to use. This ontologically appears to work at all-levels and all-structures of data if it can be represented in a neural network. There are things outside of the realm of a neural network that can be represented in a neural network, and there are things that can be represented in a neural network that can't be represented but can be categorized and structured via another neural networks.
 
- - micromamba
- - VScode
- - Etc.
+The cognosis project explores the idea that information may be a fundamental building block of our reality. If so, could our computations and simulations not just model reality, but in some sense, shape it? Traditional notions of domains, attributes, and even physical laws may become more malleable when viewed through the lens of information processing. This raises a provocative question: Can purely computational processes generate the phenomena we associate with the physical universe, such as time, inertia, and perhaps even seemingly 'unexplained' events such as consciousness itself?
 
+The Cognosis Runtime: A Quantum Block of Computation
 
-## instructions for wsb
+Think of the runtime as a self-contained, ephemeral moment of computation.  It draws inspiration from neural networks and the potential of quantum entanglement.  At its core, the runtime is a 'block' of tokens, with a  flexible size (we'll start with a power of 2 around 2000). Each token encapsulates data,  logic, and potential output,  similar to a tiny, self-contained program.
 
-rename to your $PATH in cfg.wsb
-
-click or invoke the .wsb then wait for the sandbox to load and click boxy.bat on the desktop. If errors ensue: close the sandbox and re-open.
-
-open miniforge prompt and `conda activate base`, then `mamba create -n 3ten python=3.10`, then `mamba init` before closing the terminal that opens automatically.
-
-### docker & jupyter-python:
-
-ENTRYPOINT ["jupyter", "notebook", "--ip='0.0.0.0'", "--port=8888", "--no-browser", "--allow-root"]
-
-> docker build . -t jpt
-
-> docker run -d -p 8888:8888 jpt:latest```
-
-http://127.0.0.1:8888/lab - jupyter lab (kernel select, file manager, etc)
-
-http://127.0.0.1:8888/tree? - files
-
-
-### /dev/diy/...
-
-
-/dev/diy_llm_skim.py is meant to take diyllmdump.txt and transform it into output.md while removing all the undesired formatting. The undesired formatting is picked-up when preforming a 'ctrl+a' in the browser, in the chat-session.
-
-
-
-```
-"When aiming for a unified learning experience across knowledge bases A and B, aligning and integrating B's ontology and pedagogical structure with A's is crucial. This indicates that before incorporating B into A, we need to ensure that B's ontology (the nature and categorization of its concepts) and pedagogy (the methodology of teaching or organizing information) are compatible with A."
-```
-
-
-
-
+The challenge lies in the 'cognitive lambda calculus' needed to bring these runtimes into existence and evolve them.
