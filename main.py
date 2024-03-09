@@ -17,6 +17,7 @@ def setup_logger(n_parent_dirs=1, logging_config=None):
         logs_dir.mkdir(exist_ok=True)
 
     log_file_path = logs_dir / 'setup.log'
+    logger = logging.getLogger()  # Get the root logger
     logger.info(f"Log file path: {log_file_path}")
 
     if logging_config is None:
@@ -53,7 +54,6 @@ def setup_logger(n_parent_dirs=1, logging_config=None):
 
     dictConfig(logging_config)
 
-    logger = logging.getLogger()
     setattr(logger, 'parent', Path(__file__).resolve().parent)
 
     return logger
