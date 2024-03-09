@@ -1,43 +1,77 @@
+import sys
 import os
-import shutil
+import logging
 from pathlib import Path
+from logging.handlers import RotatingFileHandler
+from logging.config import dictConfig
 
-def migrate_media(vault_path, media_dir=".media"):
-    """
-    Migrates linked media files in an Obsidian vault to a dedicated media directory.
+def setup_logger(n_parent_dirs=1, logging_config=None):
+    current_dir = Path(__file__).resolve().parent
 
-    Args:
-        vault_path (str): Path to your Obsidian vault.
-        media_dir (str): Name of the media directory (relative to the vault).
-    """
+    # Check for 'logs' in the current directory and up to n_parent_dirs
+    for _ in range(n_parent_dirs + 1):
+        logs_dir = current_dir / 'logs'
+        if logs_dir.exists():
+            break  # Found an existing 'logs' directory
+        current_dir = current_dir.parent
+    else:  # No 'logs' directory found in the search path
+        logs_dir = current_dir / 'logs'
+        logs_dir.mkdir(exist_ok=True)
 
-    media_path = Path(vault_path) / media_dir
-    media_path.mkdir(exist_ok=True)  # Create the media directory if needed
+    log_file_path = logs_dir / 'setup.log'
 
-    # Iterate over Markdown files in the vault
-    for md_file in vault_path.rglob("*.md"):
-        with md_file.open("r+") as f:  # Open in read/write mode
-            content = f.read()
+    if logging_config is None:
+        logging_config = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'default': {
+                    'format': '[%(levelname)s]%(asctime)s||%(name)s: %(message)s',
+                    'datefmt': '%Y-%m-%d~%H:%M:%S%z'
+                },
+            },
+            'handlers': {
+                'console': {
+                    'level': logging.INFO,
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'default',
+                    'stream': 'ext://sys.stdout'
+                },
+                'file': {
+                    'level': logging.INFO,
+                    'formatter': 'default',
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'filename': logs_dir / 'app.log',
+                    'maxBytes': 10485760,  # 10MB
+                    'backupCount': 10
+                }
+            },
+            'root': {
+                'level': logging.INFO,
+                'handlers': ['console', 'file']
+            }
+        }
 
-            # Find linked media files (adjust the pattern if needed)
-            for match in re.finditer(r"!\[\[(.*?)\]\]", content):
-                original_path = Path(vault_path) / match.group(1)
-                if original_path.exists():
-                    # Calculate new filename (add hashing, metadata if desired)
-                    new_filename = original_path.name 
-                    new_path = media_path / new_filename
+    dictConfig(logging_config)
 
-                    # Move the file
-                    shutil.move(original_path, new_path)
+    logger = logging.getLogger()
+    setattr(logger, 'parent', Path(__file__).resolve().parent)
 
-                    # Update the link in the Markdown file
-                    new_link = f"![[{media_dir}/{new_filename}]]"
-                    content = content.replace(match.group(0), new_link)
+    return logger
 
-            f.seek(0)  # Reset file pointer
-            f.write(content)
-            f.truncate() 
+def main():
+    try:
+        sys.path.append((Path(__file__).resolve().parent / '..').resolve())  # is there adequate permission to expand the path?
+    except Exception as e:
+        print(e)
+    finally:
+        sys.path.extend([
+            (Path(__file__).resolve().parent / 'src').resolve(),
+            (Path(__file__).resolve().parent).resolve(),
+        ])
+    logger = setup_logger(n_parent_dirs=2)  # Example: Check 2 parent directories
+    logger.info("main.py's __main__ is running")
+    return 0
 
 if __name__ == "__main__":
-    vault_path = input("Enter your Obsidian vault path: ")
-    migrate_media(vault_path)
+    main()

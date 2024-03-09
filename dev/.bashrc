@@ -238,6 +238,9 @@ export PATH="/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1:$PATH"
 # ----------------------------------------------------
 #  GO init
 export PATH=$PATH:$HOME/.go/go/bin
+#  pipx init
+#  .local path init
+export PATH=$PATH:~/.local/bin
 # ==========================================================
 # End of Custom Bash Configurations
 # ==========================================================
