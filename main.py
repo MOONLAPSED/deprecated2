@@ -1,8 +1,6 @@
 import sys
-import os
 import logging
 from pathlib import Path
-from logging.handlers import RotatingFileHandler
 from logging.config import dictConfig
 
 def setup_logger(n_parent_dirs=1, logging_config=None):
@@ -19,6 +17,7 @@ def setup_logger(n_parent_dirs=1, logging_config=None):
         logs_dir.mkdir(exist_ok=True)
 
     log_file_path = logs_dir / 'setup.log'
+    logger.info(f"Log file path: {log_file_path}")
 
     if logging_config is None:
         logging_config = {
