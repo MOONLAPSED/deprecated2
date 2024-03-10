@@ -1,8 +1,8 @@
 import sys
 import logging
 from pathlib import Path
-from logging import StreamHandler
 from logging.config import dictConfig
+import time
 
 def main(n_parent_dirs: int = 0):
     logs_dir = Path(__file__).resolve().parent / 'logs'
@@ -55,7 +55,70 @@ def main(n_parent_dirs: int = 0):
     logger = logging.getLogger(__name__)
 
     return logger
+
+class ProgressBarLogger:
+    def __init__(self, total=100):
+        self.total = total
+        self.count = 0
         
+    def update(self, increment=1):
+      
+        self.count += increment
+        percent_complete = self.count / self.total * 100
+        
+        # Log progress bar at info level
+        logger.info(f"[{'='*int(percent_complete/10)}:<10] {percent_complete:.0f}%")
+        # Pause for each 25% section
+        if percent_complete <= 25:
+            time.sleep(0.1)
+        elif percent_complete <= 50: 
+            time.sleep(0.2)
+        elif percent_complete <= 75:
+            time.sleep(0.3)
+        else:
+            time.sleep(0.4)
+
+        sys.stdout.write('\r')
+        sys.stdout.flush()
+
+        if percent_complete == 100:
+            sys.stdout.write('\n')
+            sys.stdout.flush()
+            time.sleep(0.1)
+            return True
+        return False
+        
+    def reset(self):
+            self.count = 0
+
+    def set_total(self, total):
+        self.total = total
+        self.count = 0
+
+    def get_count(self):
+        return self.count
+    
+    def get_total(self):
+        return self.total
+        
+    def get_percent_complete(self):
+            return self.count / self.total * 100
+    
+    def get_progress_bar(self):
+        percent_complete = self.count / self.total * 100
+        return f"[{'='*int(percent_complete/10)}:<10] {percent_complete:.0f}%"
+    
+
 if __name__ == '__main__':
     logger = main()
-    main().info('Hello World!')
+    main().info('Loading... 1/2...')
+    bar = ProgressBarLogger()
+    for i in range(100):
+        bar.update()
+    
+    bar.reset()
+    main().info('Loading... 2/2...')
+    bar.set_total(100)
+    for i in range(100):
+        bar.update()
+    bar.reset()
