@@ -1,76 +1,61 @@
 import sys
 import logging
 from pathlib import Path
+from logging import StreamHandler
 from logging.config import dictConfig
 
-def setup_logger(n_parent_dirs=1, logging_config=None):
+def main(n_parent_dirs: int = 0):
+    logs_dir = Path(__file__).resolve().parent / 'logs'
+    
+    sys.path.append((Path(__file__).resolve().parent / '..').resolve())
+    sys.path.append((Path(__file__).resolve().parent / 'src').resolve())
     current_dir = Path(__file__).resolve().parent
 
-    # Check for 'logs' in the current directory and up to n_parent_dirs
     for _ in range(n_parent_dirs + 1):
         logs_dir = current_dir / 'logs'
         if logs_dir.exists():
-            break  # Found an existing 'logs' directory
+            break  
         current_dir = current_dir.parent
-    else:  # No 'logs' directory found in the search path
-        logs_dir = current_dir / 'logs'
-        logs_dir.mkdir(exist_ok=True)
 
-    log_file_path = logs_dir / 'setup.log'
-    logger = logging.getLogger()  # Get the root logger
-    logger.info(f"Log file path: {log_file_path}")
-
-    if logging_config is None:
-        logging_config = {
-            'version': 1,
-            'disable_existing_loggers': False,
-            'formatters': {
-                'default': {
-                    'format': '[%(levelname)s]%(asctime)s||%(name)s: %(message)s',
-                    'datefmt': '%Y-%m-%d~%H:%M:%S%z'
-                },
+    logs_dir.mkdir(exist_ok=True)
+    
+    logging_config = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'default': {
+                'format': '[%(levelname)s]%(asctime)s||%(name)s: %(message)s',
+                'datefmt': '%Y-%m-%d~%H:%M:%S%z'
             },
-            'handlers': {
-                'console': {
-                    'level': logging.INFO,
-                    'class': 'logging.StreamHandler',
-                    'formatter': 'default',
-                    'stream': 'ext://sys.stdout'
-                },
-                'file': {
-                    'level': logging.INFO,
-                    'formatter': 'default',
-                    'class': 'logging.handlers.RotatingFileHandler',
-                    'filename': logs_dir / 'app.log',
-                    'maxBytes': 10485760,  # 10MB
-                    'backupCount': 10
-                }
+        },
+        'handlers': {
+            'console': {
+                'level': None,
+                'class': 'logging.StreamHandler',
+                'formatter': 'default',
+                'stream': 'ext://sys.stdout'
             },
-            'root': {
-                'level': logging.INFO,
-                'handlers': ['console', 'file']
+            'file': {
+                'level': None,
+                'formatter': 'default',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': logs_dir / 'app.log',
+                'maxBytes': 10485760,  # 10MB
+                'backupCount': 10
             }
+        },
+        'root': {
+            'level': logging.INFO,
+            'handlers': ['console', 'file']
         }
+    }
 
     dictConfig(logging_config)
 
-    setattr(logger, 'parent', Path(__file__).resolve().parent)
+    logger = logging.getLogger(__name__)
 
     return logger
-
-def main():
-    try:
-        sys.path.append((Path(__file__).resolve().parent / '..').resolve())  # is there adequate permission to expand the path?
-    except Exception as e:
-        print(e)
-    finally:
-        sys.path.extend([
-            (Path(__file__).resolve().parent / 'src').resolve(),
-            (Path(__file__).resolve().parent).resolve(),
-        ])
-    logger = setup_logger(n_parent_dirs=2)  # Example: Check 2 parent directories
-    logger.info("main.py's __main__ is running")
-    return 0
-
-if __name__ == "__main__":
-    main()
+        
+if __name__ == '__main__':
+    logger = main()
+    main().info('Hello World!')
