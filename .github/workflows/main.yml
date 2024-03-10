@@ -51,7 +51,7 @@ jobs:
             sudo apt install -y chromium-chromedriver
             pip install selenium litellm 
             curl -fsSL https://ollama.com/install.sh | sh      
-            pip install -r requirements.txt 
+            pip install . >> logs/setup.log 2>&1
             echo "::set-output name=result::$result" >> logs/setup.log 2>&1
               
       - name: Run main python app
