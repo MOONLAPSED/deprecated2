@@ -41,7 +41,6 @@ jobs:
           echo $PATH | tee -a logs/setup.log 2>&1
           echo $VIRTUAL_ENV | tee -a logs/setup.log 2>&1
           echo $PYTHONPATH | tee -a logs/setup.log 2>&1
-          echo "__ele__.main()" tee -a logs/setup.log 2>&1
       - name: Install dependencies and set up environment
         run: | 
             sudo apt-get update
@@ -50,10 +49,10 @@ jobs:
             sudo apt install curl -y
             sudo apt install -y chromium-chromedriver
             pip install selenium litellm 
-            curl -fsSL https://ollama.com/install.sh | sh      
-            pip install . >> logs/setup.log 2>&1
-            echo "::set-output name=result::$result" >> logs/setup.log 2>&1
-              
+            curl -fsSL https://ollama.com/install.sh | sh
+      - name: Install pip dependencies
+        run: |
+          pip install -r pyproject.toml || exit 1 >> logs/python-app.log 2>&1
       - name: Run main python app
         run: |
           python main.py 2>&1 | tee -a logs/app.log logs/python-app.log
@@ -61,5 +60,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: python-app
-          path: logs/python-app.log
+          name: python-app-logs
+          path: logs
