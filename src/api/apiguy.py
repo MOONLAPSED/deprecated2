@@ -1,4 +1,26 @@
 import httpx
+from pydantic import create_model, ValidationError, BaseModel
+import toml
+import asyncio
+import logging
+
+ml = logging.getLogger(__name__)
+
+def load_definitions(path="src/api/static/api_definitions.toml"):
+    """
+    Loads the API definitions from a TOML file.
+    """
+    with open(path, "r") as f:
+        definitions = toml.load(f)
+        return definitions
+    
+def get_definition(name, path="src/api/static/api_definitions.toml"):
+    """
+    Loads the API definition from a TOML file.
+    """
+    definitions = load_definitions(path)
+    return definitions[name]
+
 
 # Define the API endpoints
 API_ENDPOINTS = {
@@ -44,6 +66,20 @@ async def main():
   async with httpx.AsyncServer(app=api_handler, port=8000) as server:
     await server.serve()
 
+def main():
+  ml.info(f'API module initialized\n Logging initialized src: %s', __file__)
+  defs=load_definitions()
+  for key in defs:
+      ml.info(f'{key}')
+      for k,v in defs[key].items():
+          ml.info(f'{k}={v}')
+  if k=='path':
+      ml.info(f'path={v}')
+  ml.info(f'path={v}')
+
+
+
 if __name__ == "__main__":
-  import asyncio
+
   asyncio.run(main())
+  main()
