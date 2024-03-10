@@ -365,3 +365,7 @@ Similar to HTTP 5xx server errors:
 Code	Error	Cause
 20001	Bad Handler	Implementation error
 20002	Internal Handler Error	Uncaught exception
+```
+
+
+#### TaskBot Standard - translated from Chinese by GPT - author's repo and license info: https://github.com/botuniverse/onebot
