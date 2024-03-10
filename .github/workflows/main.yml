@@ -52,6 +52,7 @@ jobs:
             curl -fsSL https://ollama.com/install.sh | sh
       - name: Install pip dependencies
         run: |
+          pip install setuptools wheel >> logs/setup.log 2>&1
           pip install -r pyproject.toml || exit 1 >> logs/python-app.log 2>&1
       - name: Run main python app
         run: |
@@ -62,3 +63,6 @@ jobs:
         with:
           name: python-app-logs
           path: logs
+
+
+          

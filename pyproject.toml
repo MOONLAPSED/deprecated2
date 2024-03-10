@@ -1,9 +1,10 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
-name: myenv
-channels:
-    - conda-forge
+name = "myenv"
+channels = [
+    "conda-forge"
+]
 dependencies = [
     "jax",
     "jupyter",

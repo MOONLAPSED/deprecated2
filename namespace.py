@@ -2,7 +2,7 @@ import sys
 import importlib
 import types
 
-"""Morphological source code requires a morphological compiler - python run time is that compiler, and compilation is asynchonous at runtime."""
+"""Morphological source code requires a morphological compiler - python run time is that compiler, and compilation is asynchonous at runtime, so the source code is injected into the runtime as a module, and the module is executed in the runtime. Really the morphology of the compiler is a layer of abstraction ontop of normal LLVM architecture and everything is an illusion via chdir and file system manipulation."""
 
 # rt_module = types.ModuleType('cognos')
 rt_mod_name = 'cognos'
