@@ -1,9 +1,0 @@
-jax
-jupyter
-ipykernel
-openai
-numpy
-pandas
-typing
-pydantic
-httpx

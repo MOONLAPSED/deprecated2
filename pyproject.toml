@@ -1,6 +1,40 @@
 [build-system]
-requires = ["setuptools>=58.0.4", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "cognos"
+description = "cognOS for cognosis, namespace and filesystem interface; obsidian kb"
+authors = [{ name = "MOONLAPSED", email = "MOONLAPSED@gmail.com" }]
+version = "0.1.0"
+requires-python = ">= 3.11"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[tool.flottbot]
+url = "https://github.com/target/flottbot/releases/download/0.13.1/flottbot-linux-amd64.tar.gz"
+
+[tool.pdm.conda]
+runner = "micromamba"
+channels = ["conda-forge/noarch", "conda-forge", "anaconda"]
+dependencies = ["pdm", "jax", "jupyter", "ipykernel", "openai", "numpy", "pandas", "typing", "pydantic", "httpx", "docker"]
+as-default-manager = true
+solver = "libmamba"
+excludes = ["pytest-cov"] # don't install with conda even if it's a dependency from other packages
+installation-method = "copy"
+batched-commands = true
+
+[tool.pdm.conda.pypi-mapping]
+download-dir = "/tmp"
+url = "https://url/to/mapping.yaml"
+
+[tool.pdm.conda.optional-dependencies]
+extra = ["anaconda:ffmpeg"] # non python dependency, obtained from anaconda channel
+
+[tool.pdm.conda.dev-dependencies]
+dev = ["pytest", "mypy"]
 
 [build-system.backends.go]
 name = "go"

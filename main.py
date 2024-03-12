@@ -2,23 +2,21 @@ import sys
 import logging
 from pathlib import Path
 from logging.config import dictConfig
-import time
+import argparse
 
-def main(n_parent_dirs: int = 0):
+def main() -> logging.Logger:
+    # logging for the dir the script is invoked from - global scope but not in the global namespace (logs... /x/logs.. /y/logs...)
     logs_dir = Path(__file__).resolve().parent / 'logs'
-    
-    sys.path.append((Path(__file__).resolve().parent / '..').resolve())
+    logs_dir.mkdir(exist_ok=True)
+    # explicit path for non .py-files (python does this for .py source files automatically)
+    sys.path.append((Path(__file__).resolve().parent / '.').resolve())
     sys.path.append((Path(__file__).resolve().parent / 'src').resolve())
     current_dir = Path(__file__).resolve().parent
-
-    for _ in range(n_parent_dirs + 1):
-        logs_dir = current_dir / 'logs'
-        if logs_dir.exists():
-            break  
+    # check for logging in parent dirs to the current dir
+    while not (current_dir / 'logging.conf').exists():
         current_dir = current_dir.parent
-
-    logs_dir.mkdir(exist_ok=True)
-    
+        if current_dir == Path('/'):
+            break
     logging_config = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -53,72 +51,14 @@ def main(n_parent_dirs: int = 0):
     dictConfig(logging_config)
 
     logger = logging.getLogger(__name__)
-
+    logger.info(f'Logging_dir {logs_dir}|'
+                f'\nSource_file: {__file__}|'
+                f'\nInvocation_dir: {Path(__file__).resolve().parent}|'
+                f'\nWorking_dir: {current_dir}||')
+    
     return logger
 
-class ProgressBarLogger:
-    def __init__(self, total=100):
-        self.total = total
-        self.count = 0
-        
-    def update(self, increment=1):
-      
-        self.count += increment
-        percent_complete = self.count / self.total * 100
-        
-        # Log progress bar at info level
-        logger.info(f"[{'='*int(percent_complete/10)}:<10] {percent_complete:.0f}%")
-        # Pause for each 25% section
-        if percent_complete <= 25:
-            time.sleep(0.1)
-        elif percent_complete <= 50: 
-            time.sleep(0.2)
-        elif percent_complete <= 75:
-            time.sleep(0.3)
-        else:
-            time.sleep(0.4)
-
-        sys.stdout.write('\r')
-        sys.stdout.flush()
-
-        if percent_complete == 100:
-            sys.stdout.write('\n')
-            sys.stdout.flush()
-            time.sleep(0.1)
-            return True
-        return False
-        
-    def reset(self):
-            self.count = 0
-
-    def set_total(self, total):
-        self.total = total
-        self.count = 0
-
-    def get_count(self):
-        return self.count
-    
-    def get_total(self):
-        return self.total
-        
-    def get_percent_complete(self):
-            return self.count / self.total * 100
-    
-    def get_progress_bar(self):
-        percent_complete = self.count / self.total * 100
-        return f"[{'='*int(percent_complete/10)}:<10] {percent_complete:.0f}%"
-    
-
 if __name__ == '__main__':
-    logger = main()
-    main().info('Loading... 1/2...')
-    bar = ProgressBarLogger()
-    for i in range(100):
-        bar.update()
-    
-    bar.reset()
-    main().info('Loading... 2/2...')
-    bar.set_total(100)
-    for i in range(100):
-        bar.update()
-    bar.reset()
+    main()
+    from src import launch
+    launch.main()
