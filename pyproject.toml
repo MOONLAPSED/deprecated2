@@ -13,6 +13,10 @@ requires-python = ">= 3.11"
 file = "README.md"
 content-type = "text/markdown"
 
+[project.api.readme]
+file = "src/api/static/README.md"
+content-type = "text/markdown"
+
 [tool.flottbot]
 url = "https://github.com/target/flottbot/releases/download/0.13.1/flottbot-linux-amd64.tar.gz"
 
