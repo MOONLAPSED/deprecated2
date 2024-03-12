@@ -1,8 +1,13 @@
 import logging
+from pathlib import Path
+import sys
+import os
 
-if 'ml' not in logging.Logger.manager.loggerDict:
+
+if 'runtime' not in logging.Logger.manager.loggerDict:
     logging.basicConfig(level=logging.INFO)
-ml = logging.getLogger('ml')
+runtime = logging.getLogger('runtime')
 
 def main() -> None:
-    ml.info('Hello World!')
+    runtime.info(f"'runtime|{__file__}| invoked from {Path(__file__).resolve().parent}||")
+    # evaluate the runtime state, invoked from ..main.py? via src.launch? Via a symlink or custom launcher?

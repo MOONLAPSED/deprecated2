@@ -31,7 +31,6 @@ def copy(src, dst):
                         else:
                             shutil.copytree(src_el[j], dst[j]+'/'+src_el[j], dirs_exist_ok=True)
                             total_size += get_directory_size(src_el[j])
-                        
                         # Check the total size against the limit
                         if total_size >= llimit:
                             print("File size limit reached. Stopping further copies.")
@@ -84,16 +83,16 @@ class SerializationInterface(ABC):
     @abstractmethod
     def serialize(self):
         pass
-    
+
     @abstractmethod
     def deserialize(self):
         pass
 
 class JsonSerializer(SerializationInterface):
-    
+
     def serialize(self):
         return f"Serialized to JSON"
-    
+
     def deserialize(self):
         return f"Deserialized from JSON:\n{os.path.join(os.path.dirname(os.path.realpath(__file__)), 'app.log')}"
 
@@ -136,4 +135,4 @@ def call(self, cmd, **kwargs):
         e = subprocess.CalledProcessError(return_code, cmd, output=out)
         e.stdout, e.stderr = out, err
         raise e
-    return self.SubprocessResult(out, err, return_code) 
+    return self.SubprocessResult(out, err, return_code)

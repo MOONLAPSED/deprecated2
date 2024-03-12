@@ -1,4 +1,7 @@
-
+from collections import deque
+import os
+import sys
+import pathlib
 """
 Creates heriarchial tree representation of a network.
 The tree representation is created by traversing the network and creating a tree of the layers.
@@ -101,4 +104,4 @@ def _check_for_obst(self, steps, vector_mag, clear_x, clear_y):
                 lag -= 1
             else:
                 (clear_x, clear_y) = lookahead.popleft()
-        return (clear_x, clear_y) 
+        return (clear_x, clear_y)

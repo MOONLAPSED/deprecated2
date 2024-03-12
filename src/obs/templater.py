@@ -21,7 +21,7 @@ def headmatter():
     print(f'%)
 
 def main():
-    headmatter = 
+    headmatter = headmatter()
 '''
 '''
 import os
@@ -50,7 +50,7 @@ def migrate_media(vault_path, media_dir=".media"):
                 original_path = Path(vault_path) / match.group(1)
                 if original_path.exists():
                     # Calculate new filename (add hashing, metadata if desired)
-                    new_filename = original_path.name 
+                    new_filename = original_path.name
                     new_path = media_path / new_filename
 
                     # Move the file
@@ -62,7 +62,7 @@ def migrate_media(vault_path, media_dir=".media"):
 
             f.seek(0)  # Reset file pointer
             f.write(content)
-            f.truncate() 
+            f.truncate()
 
 if __name__ == "__main__":
     vault_path = input("Enter your Obsidian vault path: ")
