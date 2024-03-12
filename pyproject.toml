@@ -18,7 +18,7 @@ file = "src/api/static/README.md"
 content-type = "text/markdown"
 
 [tool.flottbot]
-url = "https://github.com/target/flottbot/releases/download/0.13.1/flottbot-linux-amd64.tar.gz"
+url = "https://github.com/target/flottbot/releases/download/0.13.1/flottbot-linux-arm64.tar.gz"
 
 [tool.pdm.conda]
 runner = "micromamba"
