@@ -5,6 +5,9 @@ from logging.config import dictConfig
 import argparse
 import importlib
 import types
+from importlib import import_module
+from importlib.util import spec_from_file_location, module_from_spec
+from types import SimpleNamespace
 
 def main() -> logging.Logger:
     # logging for the dir the script is invoked from - global scope but not in the global namespace (logs... /x/logs.. /y/logs...)
@@ -15,7 +18,8 @@ def main() -> logging.Logger:
     sys.path.append((Path(__file__).resolve().parent / 'src').resolve())
     current_dir = Path(__file__).resolve().parent
     # check for logging in parent dirs to the current dir
-    while not (current_dir / 'logging.conf').exists():
+    while not (current_dir / 'logs').exists():
+        # ascend to the highest logs dir
         current_dir = current_dir.parent
         if current_dir == Path('/'):
             break
@@ -62,25 +66,39 @@ def main() -> logging.Logger:
 
 if __name__ == '__main__':
     main()
-    from src import launch
-    launch.main()
+    runtime = logging.getLogger('runtime')
+    try:
+
+        """Morphological source code requires a morphological compiler - python run time is that compiler, and compilation is asynchonous at runtime.
+        So the source code is injected into the runtime as a module, and the module is executed in the runtime.
+        """
+        rt_module = types.ModuleType('cognos')
+        rt_mod_name = 'cognos'
+        rt_mod_path = sys.modules['__main__'].__file__
+        # rt_mod_path = "/workspaces/cognos/src/launch.py"
+
+        rt_mod = types.ModuleType(rt_mod_name)
+        rt_mod.__file__ = rt_mod_path  # for importlib.util.spec_from_file_location
+        sys.modules[rt_mod_name] = rt_mod  # rt in globals() or globals().__setitem__(rt_mod_name, rt_mod)
+
+        with open(rt_mod_path, 'r') as f:  # open [[source code|rt_src]]
+            rt_mod_src = f.read()
+
+        code = compile(rt_mod_src, rt_mod_path, 'exec')
+
+        exec(code, rt_mod.__dict__)  # exec [[source code|rt_src]] in rt_mod.__dict__ --> inject frontmatter into obsidian architecture
+    except Exception as e:
+        runtime.error(f'Error: {e}||')
+        raise e
+    finally:
+        runtime.info(f'runtime|{__file__}| invoked from {Path(__file__).resolve().parent}||')
 
 
-    """Morphological source code requires a morphological compiler - python run time is that compiler, and compilation is asynchonous at runtime.
-    So the source code is injected into the runtime as a module, and the module is executed in the runtime.
-    """
-    # rt_module = types.ModuleType('cognos')
-    rt_mod_name = 'cognos'
-    # rt_mod_path = sys.modules['__main__'].__file__
-    rt_mod_path = "/workspaces/cognos/src/launch.py"
-
-    rt_mod = types.ModuleType(rt_mod_name)
-    rt_mod.__file__ = rt_mod_path  # for importlib.util.spec_from_file_location
-    sys.modules[rt_mod_name] = rt_mod  # rt in globals() or globals().__setitem__(rt_mod_name, rt_mod)
-
-    with open(rt_mod_path, 'r') as f:  # open [[source code|rt_src]]
-        rt_mod_src = f.read()
-
-    code = compile(rt_mod_src, rt_mod_path, 'exec')
-
-    exec(code, rt_mod.__dict__)  # exec [[source code|rt_src]] in rt_mod.__dict__ --> inject frontmatter into obsidian architecture
+    # importlib.import_module(rt_mod_name)
+    for mod in SimpleNamespace(
+        globals=globals(),
+        locals=locals(),
+        sys_modules=sys.modules
+    ).sys_modules:
+        if isinstance(mod, str):
+            runtime.info(f'||{mod}||')
