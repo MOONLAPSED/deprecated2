@@ -52,4 +52,4 @@ requires = ["npm>10.4.0"]
 main = "main.py"
 source = "src/launch.py"
 tree = "src/obs/tree.py"
-guy = "src/api/apiguy.py"
+apiguy = "src/api/apiguy.py"
