@@ -10,6 +10,7 @@ All tree methods must break the network into a tree of layers, and then create a
 Tree to Tree operations are 'interpreted' at runtime - via NLP and agentic, out of scope, operations. Trees must maintain internal-consistency and be able to be 'interpreted' by the network.
 """
 
+# conforms with MyST notebook format and obsidian markdown(function calling, etc.) - see https://myst-parser.readthedocs.io/en/latest/
 
 def _insert_header(incomings, outgoings):
     """Insert the header (first two lines) in the representation."""

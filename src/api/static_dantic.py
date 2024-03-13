@@ -1,7 +1,6 @@
 import pydantic
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
-from apiguy import *
 
 
 def create_model(model_name, model_def):

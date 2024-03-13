@@ -65,7 +65,7 @@ def main() -> logging.Logger:
     return logger
 
 if __name__ == '__main__':
-    main()
+    ml = main()
     runtime = logging.getLogger('runtime')
     try:
 
@@ -86,12 +86,12 @@ if __name__ == '__main__':
 
         code = compile(rt_mod_src, rt_mod_path, 'exec')
 
-        exec(code, rt_mod.__dict__)  # exec [[source code|rt_src]] in rt_mod.__dict__ --> inject frontmatter into obsidian architecture
+        # exec(code, rt_mod.__dict__)  # exec [[source code|rt_src]] in rt_mod.__dict__ --> inject frontmatter into obsidian architecture
     except Exception as e:
-        runtime.error(f'Error: {e}||')
+        runtime.error(f'||Error: {e}||')
         raise e
     finally:
-        runtime.info(f'runtime|{__file__}| invoked from {Path(__file__).resolve().parent}||')
+        runtime.info(f'||runtime|{__file__}|| invoked from {Path(__file__).resolve().parent}||')
 
 
     # importlib.import_module(rt_mod_name)
@@ -102,3 +102,5 @@ if __name__ == '__main__':
     ).sys_modules:
         if isinstance(mod, str):
             runtime.info(f'||{mod}||')
+
+    ml.info(f'||{rt_mod_name}|| concluded...')
