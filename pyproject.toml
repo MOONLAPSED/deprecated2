@@ -49,6 +49,4 @@ name = "npm"
 requires = ["npm>10.4.0"]
 
 [project.scripts]
-main = "main.py"
-source = "src/launch.py"
-tree = "src/obs/tree.py"
+main = "main.py:main"
