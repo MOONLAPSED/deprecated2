@@ -8,7 +8,14 @@ import types
 from importlib import import_module
 from importlib.util import spec_from_file_location, module_from_spec
 from types import SimpleNamespace
-
+""" cognosis commenting sub-routines for NLP cognition and re-cognition of the source code of the module and submodules and their SimpleNamespaces and any filesystem objects they create or link to  |
+'|' == next line
+'||' == next_subsection -- source code will appear before the next subsection
+'|||' == end_section  -- proceed to source code as-normally, ignoring all comments and triple-pipes
+'normal' comments have no pipes whatsoever (or they are escaped, if they are) |"""
+# notate within 'triple-pipes' mandatory NLP 'cognitive notes' which accompany module and submodule source code and SimpleNamespaces  |
+# the final 'triple-pipes' indicates to any-reader of the source code that NLP has concluded or finished and normal python code can resume 'ignoring' the mandatory NLP and [[triple-pipes]] sub-routines  |
+# [[double-bracket]]ed entities are NLP namespaces, which, if unavailable-for import, will be created in the runtime (and validated as source code at conclusion of runtime and the git commits itself).  ||
 def main() -> logging.Logger:
     """
     Configures logging for the app.
@@ -19,7 +26,7 @@ def main() -> logging.Logger:
     Returns:
         logging.Logger: The logger for the module.
     """
-    # logging for the dir the script is invoked from - global scope but not in the global namespace (logs... /x/logs.. /y/logs...)
+    # logging for the dir the script is invoked from - global scope but not in the global namespace (logs... /x/logs.. /y/logs...)  |||
     logs_dir = Path(__file__).resolve().parent / 'logs'
     logs_dir.mkdir(exist_ok=True)
     # explicit path for non .py-files (python does this for .py source files automatically)
