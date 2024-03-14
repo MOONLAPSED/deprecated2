@@ -232,3 +232,13 @@ SEE ALSO
 NOTES
 The cognosis system is under active development.  Your experiences may change with subsequent iterations.
 """)
+
+# see also src/obs/... for obsidian kb markdown syntax and implementation  |
+# see also src/flash/... for flashbot and flashing markdown syntax and implementation  |
+# see also src/.chatops/... for chatops markdown syntax and implementation (actual python source code, which grants our BYOI entity motiltiy and capabilities within the runtime)  |
+# see also src/simple/... for runtime associative pre-commit ephemeral kb implementation with 100% r/w/x for the python runtime (where the kb is mounted as source code)  |
+    # git commit is the queue and the versioning, validation is a pre-commit hook  |
+    # the validation hook will 'test' ephemeral namespace against the knowledge base, the results of which will be 'learned' by the bot and the user in the source code kb (filesystem non-ephemeral)  |
+# flash: to 'test' a namespace against the whole of the source code kb. Main method is via back-propagation of 'learned' knowledge from the kb to the ephemeral kb in a depth-first manner.  |
+# [[entities]] are NLP un-tested and ephemeral kb candidates, or they are 'compiled' source code knowledge base data structures that are 'compiled' into the ephemeral kb.  |
+# cognosis NLP source code sub-routines and cognition and final data in this file: ['next-line', 'next-subsection', 'end_section'] maps to ['|', '||', '|||']
