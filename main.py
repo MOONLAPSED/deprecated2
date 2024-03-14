@@ -10,6 +10,15 @@ from importlib.util import spec_from_file_location, module_from_spec
 from types import SimpleNamespace
 
 def main() -> logging.Logger:
+    """
+    Configures logging for the app.
+
+    Args:
+        None
+
+    Returns:
+        logging.Logger: The logger for the module.
+    """
     # logging for the dir the script is invoked from - global scope but not in the global namespace (logs... /x/logs.. /y/logs...)
     logs_dir = Path(__file__).resolve().parent / 'logs'
     logs_dir.mkdir(exist_ok=True)
@@ -62,37 +71,11 @@ def main() -> logging.Logger:
                 f'\nInvocation_dir: {Path(__file__).resolve().parent}|'
                 f'\nWorking_dir: {current_dir}||')
     
-    return logger
 
 if __name__ == '__main__':
     ml = main()
     runtime = logging.getLogger('runtime')
-    try:
-
-        """Morphological source code requires a morphological compiler - python run time is that compiler, and compilation is asynchonous at runtime.
-        So the source code is injected into the runtime as a module, and the module is executed in the runtime.
-        """
-        rt_module = types.ModuleType('cognos')
-        rt_mod_name = 'cognos'
-        rt_mod_path = sys.modules['__main__'].__file__
-        # rt_mod_path = "/workspaces/cognos/src/launch.py"
-
-        rt_mod = types.ModuleType(rt_mod_name)
-        rt_mod.__file__ = rt_mod_path  # for importlib.util.spec_from_file_location
-        sys.modules[rt_mod_name] = rt_mod  # rt in globals() or globals().__setitem__(rt_mod_name, rt_mod)
-
-        with open(rt_mod_path, 'r') as f:  # open [[source code|rt_src]]
-            rt_mod_src = f.read()
-
-        code = compile(rt_mod_src, rt_mod_path, 'exec')
-
-        # exec(code, rt_mod.__dict__)  # exec [[source code|rt_src]] in rt_mod.__dict__ --> inject frontmatter into obsidian architecture
-    except Exception as e:
-        runtime.error(f'||Error: {e}||')
-        raise e
-    finally:
-        runtime.info(f'||runtime|{__file__}|| invoked from {Path(__file__).resolve().parent}||')
-
+    runtime.info(f'||{__file__}_runtime()||')
 
     # importlib.import_module(rt_mod_name)
     for mod in SimpleNamespace(
@@ -101,6 +84,7 @@ if __name__ == '__main__':
         sys_modules=sys.modules
     ).sys_modules:
         if isinstance(mod, str):
-            runtime.info(f'||{mod}||')
+            runtime.info(f'||{mod}_runtime()||')
+            import_module(mod)
 
-    ml.info(f'||{rt_mod_name}|| concluded...')
+    sys.exit(0)

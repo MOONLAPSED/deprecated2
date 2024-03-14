@@ -23,7 +23,7 @@ url = "https://github.com/target/flottbot/releases/download/0.13.1/flottbot-linu
 [tool.pdm.conda]
 runner = "micromamba"
 channels = ["conda-forge/noarch", "conda-forge", "anaconda"]
-dependencies = ["pdm", "jax", "jupyter", "ipykernel", "openai", "numpy", "pandas", "typing", "xonsh", "pydantic", "httpx", "docker"]
+dependencies = ["pdm", "jax", "jupyter", "ipykernel", "openai", "numpy", "pandas", "typing", "xonsh", "pydantic", "pytest", "httpx", "docker"]
 as-default-manager = true
 solver = "libmamba"
 excludes = ["pytest-cov"] # don't install with conda even if it's a dependency from other packages
