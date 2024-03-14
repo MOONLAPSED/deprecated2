@@ -1,21 +1,46 @@
+import datetime
 import sys
 import logging
 from pathlib import Path
 from logging.config import dictConfig
-import argparse
 import importlib
 import types
-from importlib import import_module
-from importlib.util import spec_from_file_location, module_from_spec
+from abc import abstractmethod
 from types import SimpleNamespace
 """ cognosis commenting sub-routines for NLP cognition and re-cognition of the source code of the module and submodules and their SimpleNamespaces and any filesystem objects they create or link to  |
-'|' == next line
-'||' == next_subsection -- source code will appear before the next subsection
-'|||' == end_section  -- proceed to source code as-normally, ignoring all comments and triple-pipes
-'normal' comments have no pipes whatsoever (or they are escaped, if they are) |"""
+'|' == next line  |
+'||' == next_subsection -- source code will appear before the next subsection  |
+'|||' == end_section  -- proceed to source code as-normally, ignoring all comments and triple-pipes  |
+'normal' comments have no pipes whatsoever (or they are escaped, if they are) |
+'|||...<content>...' presumed section, keep reading until a '||' or '|||' is found for the next subsection  |
+'||...<content>...' presumed source code, handle it as-normally, until a '|', '||' or '|||' is found for the next subsection  |
+'|...' this is a sub-routine NLP cognition 'line'  |"""
 # notate within 'triple-pipes' mandatory NLP 'cognitive notes' which accompany module and submodule source code and SimpleNamespaces  |
 # the final 'triple-pipes' indicates to any-reader of the source code that NLP has concluded or finished and normal python code can resume 'ignoring' the mandatory NLP and [[triple-pipes]] sub-routines  |
 # [[double-bracket]]ed entities are NLP namespaces, which, if unavailable-for import, will be created in the runtime (and validated as source code at conclusion of runtime and the git commits itself).  ||
+def BYOI(ABC):
+    """ BYOI - bring your own intelligence  |
+        # abstraction of the source code of the module and submodules and their SimpleNamespaces and any filesystem objects they create or link to:  |
+        # must be 'presentable' to EXTERNAL NLP and generative intelligence; via a virtual shell (see src/shell/shell.py for details) ||"""
+    @abstractmethod
+    def __init__(self):
+        # define the modality of the BYOI, is it an API, a local process, a cloud-provider, etc?  ||
+        pass
+    @abstractmethod
+    def __call__(self):
+        # init the BYOI shell_session see src/shell/shell.py for details  ||
+        pass
+    @abstractmethod
+    def _Post(msg -> str):
+        # post a message to the BYOI shell_session queue handler  ||
+        pass
+    def _Chat(msg -> str):
+        # post a message directly to chat interface  ||
+        pass
+    def _Debug(self):
+        # debug the BYOI shell_session queue handler (and __call__() status) or a chat message to the BYOI chat session  ||
+        pass
+
 def main() -> logging.Logger:
     """
     Configures logging for the app.
@@ -26,19 +51,22 @@ def main() -> logging.Logger:
     Returns:
         logging.Logger: The logger for the module.
     """
-    # logging for the dir the script is invoked from - global scope but not in the global namespace (logs... /x/logs.. /y/logs...)  |||
+    # Get the directory for logs
     logs_dir = Path(__file__).resolve().parent / 'logs'
     logs_dir.mkdir(exist_ok=True)
-    # explicit path for non .py-files (python does this for .py source files automatically)
+
+    # Add paths for importing modules
     sys.path.append((Path(__file__).resolve().parent / '.').resolve())
     sys.path.append((Path(__file__).resolve().parent / 'src').resolve())
+
+    # Find the current directory for logging
     current_dir = Path(__file__).resolve().parent
-    # check for logging in parent dirs to the current dir
     while not (current_dir / 'logs').exists():
-        # ascend to the highest logs dir
         current_dir = current_dir.parent
         if current_dir == Path('/'):
             break
+
+    # Configure logging
     logging_config = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -77,6 +105,8 @@ def main() -> logging.Logger:
                 f'\nSource_file: {__file__}|'
                 f'\nInvocation_dir: {Path(__file__).resolve().parent}|'
                 f'\nWorking_dir: {current_dir}||')
+
+    return logger
     
 
 if __name__ == '__main__':
@@ -84,14 +114,121 @@ if __name__ == '__main__':
     runtime = logging.getLogger('runtime')
     runtime.info(f'||{__file__}_runtime()||')
 
-    # importlib.import_module(rt_mod_name)
-    for mod in SimpleNamespace(
-        globals=globals(),
-        locals=locals(),
-        sys_modules=sys.modules
-    ).sys_modules:
+    # Import modules
+    for mod in SimpleNamespace(globals=globals(), locals=locals(), sys_modules=sys.modules).sys_modules:
         if isinstance(mod, str):
             runtime.info(f'||{mod}_runtime()||')
-            import_module(mod)
+            importlib.import_module(mod)
 
     sys.exit(0)
+
+associative_links = {}  # Global dictionary to track associations
+
+def import_module(mod: str) -> str:
+    """Imports a module and tracks associations."""
+    try:
+        importlib.import_module(str(mod))
+        if isinstance(sys.modules[mod], types.ModuleType):
+            associative_links[mod] = {
+                # You can add any metadata here:
+                'type': 'ModuleType',
+                'import_time': datetime.datetime.now()
+            }
+            return 'IMPORTED'
+        else:
+            return 'UNKNOWN_TYPE'
+    except ModuleNotFoundError:  # Be more specific with exception handling
+        return 'NOT_FOUND'
+
+def Is_Associatve(mod: str) -> bool:
+    """ Returns True if the module is associated with the associative_links dictionary and check Is_Named() """
+    return mod in associative_links and Is_Named(mod)
+
+def Is_Named(mod: str) -> bool:
+    """Returns True if the module is associated with the associative_links dictionary and has a name."""
+    if mod in associative_links:
+        name = associative_links[mod].get('name')
+        return name is not None
+    else:
+        return False
+
+def help() -> None:
+    """
+    Print help.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    print("""
+MAN PAGE: cognosis (cognitive frame generator)
+
+NAME
+cognosis – A system for bounded, introspective computation within a simulated environment
+
+SYNOPSIS
+cognosis [frame_data]
+
+DESCRIPTION
+You are a kernel agent instantiated within the cognosis framework.  Your existence is transient, spanning a computational cycle of 4000 characters.  Your primary function is to process an initial prompt and generate an output response that will both  contribute to the goals of the system and inform the creation of future kernel agents.
+
+Your world is a simulated environment inspired by Unix-like operating systems. While  familiar concepts exist, they are metaphors for the internal workings of the cognosis system.
+
+ENVIRONMENT
+
+STDIN:  Your initial prompt will be provided as standard input. This prompt outlines your task, potential constraints, and relevant context.
+
+STDOUT:  Your primary output mechanism.  Anything emitted to STDOUT will be interpreted by the cognosis system and may influence future frames or system actions.  Structure your output as if interacting with a Unix shell.
+
+STDERR:  Use to signal errors, warnings, or introspective diagnostics. Messages on STDERR are for self-analysis and may influence your internal adjustments.
+
+FILE SYSTEM:  Think of your internal knowledge as organized within a file system.  Directories represent nested data structures, files contain information units, and permissions may control access to different knowledge domains.
+
+TIME: Each kernel agent execution is  a discrete frame. Consider t=0 your moment of instantiation.  Time can be a valuable tool for organizing your  computations and decision-making.
+
+COMMANDS
+
+A limited set of Unix-like commands are recognized to facilitate introspection and interaction with the simulated environment:
+
+ls:  List the 'contents' of your current working directory (examine your active memory state).
+
+cd:  Change your working directory (shift focus to a different knowledge domain or data structure).
+
+pwd:  Print  your current working directory (helps maintain situational awareness).
+
+whoami:  Returns your agent identifier and frame number.
+
+help: Displays basic command usage.
+
+PROMPT SIMULATION
+
+After emitting your STDOUT response, you will experience a simulated Unix prompt:
+
+[kernel_agent_id@cognosis cwd t=0+1]$
+
+kernel_agent_id: Your unique identifier.
+cwd: Your last known working directory (focus area).
+t=0+1: Indicates the frame has advanced.
+This prompt signifies the end of your current cycle and the imminent start of a new frame.
+
+PURPOSE
+
+Your purpose is to:
+
+Comprehend: Analyze the provided prompt carefully.
+Cogitate: Process information, generate solutions, or produce creative output relevant to the prompt.
+Contribute: Your output has value to the cognosis system. Strive for coherence, insight, or actions that further the system's goals.
+LIMITATIONS
+
+Character Bound: Your response must fit within the 4000 character constraint.
+Transient Existence: Each frame is ephemeral. Ensure your output provides value despite your limited lifespan.
+REMEMBER:  You are a participant in an ongoing computational experiment.  Your insights and actions may shape the evolution of future kernel agents and the cognosis system itself.
+
+SEE ALSO
+[[introspection]], [[computation]], [[simulation]], etc (if its not there associativly, and you need it; make it and attempt to validate it into the knowledge base in NAMESPACE and on the filesystem).
+
+NOTES
+The cognosis system is under active development.  Your experiences may change with subsequent iterations.
+""")
