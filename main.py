@@ -19,7 +19,8 @@ from types import SimpleNamespace
 # notate within 'triple-pipes' mandatory NLP 'cognitive notes' which accompany module and submodule source code and SimpleNamespaces  |
 # the final 'triple-pipes' indicates to any-reader of the source code that NLP has concluded and normal python code can resume 'ignoring' the mandatory NLP and [[triple-pipes]] sub-routines  |
 # associativity is achieved via cultivation of NAMESPACE, a symlink farm, runtime methods ([[BYOI]] and [[triple-pipes]] sub-routines), and continuous reading (of the source code, and of the sub-routines within the sub-routines architecture)  |
-# [[double-bracket]]ed entities are NLP namespaces, which, if unavailable-for import, will be created in the runtime (and validated as source code at conclusion of runtime and the git commits itself).  ||
+# [[double-bracket]]ed entities are NLP namespaces, which, if unavailable-for import, will be created in the runtime (and validated as source code at conclusion of runtime and the git commits itself).  |
+# all runtime resources must be accessed via 'with' statements and all functions must try/exccept; finally, ensuring all runtime resources must be 'closed' at the end of the runtime. __enter__() and __exit__() must be defined for context managers. For example, global ENV variables should be defined as 'with' statements.  ||
 class BYOI(ABC):
     """BYOI - bring your own intelligence.
 
@@ -31,27 +32,27 @@ class BYOI(ABC):
 
     @abstractmethod
     def __init__(self) -> None:
-        # Define the modality of the BYOI, is it an API, a local process,
-        # a cloud-provider, etc?
+        # Define the modality of the BYOI, is it an API, a local process,  |
+        # a cloud-provider, etc?  ||
         pass
 
     @abstractmethod
     def __call__(self) -> None:
-        # Init the BYOI shell_session (see src/shell/shell.py for details).
+        # Init the BYOI shell_session (see src/shell/shell.py for details).  ||
         pass
 
     @abstractmethod
     def _post(self, msg: str) -> None:
-        # Post a message to the BYOI shell_session queue handler.
+        # Post a message to the BYOI shell_session queue handler.  ||
         pass
 
     def _chat(self, msg: str) -> None:
-        # Post a message directly to chat interface.
+        # Post a message directly to chat interface.  ||
         pass
 
     def _debug(self) -> None:
-        # Debug the BYOI shell_session queue handler (and __call__() status)
-        # or a chat message to the BYOI chat session.
+        # Debug the BYOI shell_session queue handler (and __call__() status)  |
+        # or a chat message to the BYOI chat session.  ||
         pass
 
 def main() -> logging.Logger:
@@ -64,22 +65,22 @@ def main() -> logging.Logger:
     Returns:
         logging.Logger: The logger for the module.
     """
-    # Get the directory for logs
+    # Get the directory for logs  ||
     logs_dir = Path(__file__).resolve().parent / 'logs'
     logs_dir.mkdir(exist_ok=True)
 
-    # Add paths for importing modules
+    # Add paths for importing modules  ||
     sys.path.append((Path(__file__).resolve().parent / '.').resolve())
     sys.path.append((Path(__file__).resolve().parent / 'src').resolve())
 
-    # Find the current directory for logging
+    # Find the current directory for logging  ||
     current_dir = Path(__file__).resolve().parent
     while not (current_dir / 'logs').exists():
         current_dir = current_dir.parent
         if current_dir == Path('/'):
             break
 
-    # Configure logging
+    # Configure logging  ||
     logging_config = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -127,7 +128,7 @@ if __name__ == '__main__':
     runtime = logging.getLogger('runtime')
     runtime.info(f'||{__file__}_runtime()||')
 
-    # Import modules
+    # Import modules  ||
     for mod in SimpleNamespace(globals=globals(), locals=locals(), sys_modules=sys.modules).sys_modules:
         if isinstance(mod, str):
             runtime.info(f'||{mod}_runtime()||')
@@ -135,7 +136,8 @@ if __name__ == '__main__':
 
     sys.exit(0)
 
-associative_links = {}  # Global dictionary to track associations
+# Global dictionary to track associations  ||
+associative_links = {}
 
 def import_module(mod: str) -> str:
     """Imports a module and tracks associations."""
@@ -150,7 +152,7 @@ def import_module(mod: str) -> str:
             return 'IMPORTED'
         else:
             return 'UNKNOWN_TYPE'
-    except ModuleNotFoundError:  # Be more specific with exception handling
+    except ModuleNotFoundError:
         return 'NOT_FOUND'
 
 def Is_Associatve(mod: str) -> bool:
