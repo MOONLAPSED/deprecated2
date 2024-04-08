@@ -9,7 +9,8 @@ from types import SimpleNamespace
 flashbot = SimpleNamespace()
 flashbot.__name__ = 'flashbot'
 flashbot.__file__ = '/workspaces/cognos/src/flash/bot.py'
-"""flashbot is a respondant to .git/pre-commit hooks that 'cleans-up' and makes 'flashes' out of the SimpleNamespace tree of modules and dataclasses, effectivly stripping the data classes and data files of their 'meta-data' and 'frontmatter' and 'backmatter' and 'source code' and 'source code comments' and 'source code docstrings' and 'source code annotations' and 'source code type hints' and 'source code imports' and 'source code function definitions' and 'source code class definitions.
+"""flashbot is a respondant to .git/pre-commit hooks that 'cleans-up' and makes 'flashes' out of the SimpleNamespace
+tree of modules and dataclasses, effectivly stripping the data classes and data files of their 'meta-data' and 'frontmatter' and 'backmatter' and 'source code' and 'source code comments' and 'source code docstrings' and 'source code annotations' and 'source code type hints' and 'source code imports' and 'source code function definitions' and 'source code class definitions.
 This is meant only in the most literal-way possible, since flashbot and flashing occurs in a peculiar 'runtime' Obsidian-markdown-formatted associative 'knowledge base' aka KB with a specific syntax and semantics that is 'compiled' into a 'flash' and then 'tested' for correctness and 'learned' by the bot and the user from a queue (git is the queue and the versioning (vehicle, metadata and config files and FlashBot and other runtime being truly responsible and git is the "oops" undo-button))."""
 class FlashBot:
     def __init__(self, config):
