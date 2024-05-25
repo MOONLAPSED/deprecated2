@@ -14,7 +14,7 @@ setup(
     author_email="MOONLAPSED@gmail.com",
     packages=find_packages(where='src'),
     install_requires=[
-        "lager @ git+https://github.com/MOONLAPSED/lager.git@main"
+        "lager @ git+https://github.com/MOONLAPSED/lager.git@1.0.0",
     ],
     python_requires='>=3.11'
 )
