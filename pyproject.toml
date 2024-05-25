@@ -18,7 +18,7 @@ content-type = "text/markdown"
 [tool.pdm.conda]
 runner = "micromamba"
 channels = ["conda-forge/noarch", "conda-forge", "anaconda"]
-dependencies = ["jax", "httpx", "lager @ git+https://github.com/MOONLAPSED/lager.git@main"]
+dependencies = ["jax", "httpx", "lager @ git+https://github.com/MOONLAPSED/lager.git@v1.0.0"]
 as-default-manager = true
 solver = "libmamba"
 excludes = ["pytest-cov"]  # don't install with conda even if it's a dependency from other packages
@@ -33,7 +33,7 @@ url = "https://url/to/mapping.yaml"
 extra = ["anaconda:ffmpeg", "anaconda::xonsh", "anaconda::pdm", "anaconda::jupyter", "anaconda::ipykernel", "anaconda::numpy", "anaconda::mypy", "anaconda::ipykernel"]
 
 [tool.pdm.conda.dev-dependencies]
-dev = ["pytest", "mypy", "pytest-cov", "black", "flake8", "pdm-pep517", "pdm-pep517-build-backend"]
+dev = ["pytest", "mypy", "pytest-cov", "black", "flake8", "pdm-pep517", "pdm-pep517-build-backend", "isort", "tox", "pre-commit", "cffi", "gcc", "cmake", "ctags"]
 
 [project.scripts]
 main = "main.py:main"
