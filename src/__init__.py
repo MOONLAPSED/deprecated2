@@ -8,7 +8,7 @@ existing initialized logger.
 """
 from pathlib import Path
 import logging
-
+__import__('pkg_resources').declare_namespace(__name__)
 ml = None
 ml = logging.getLogger(__name__)
 if ml is None:

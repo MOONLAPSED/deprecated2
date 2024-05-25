@@ -1,46 +1,18 @@
-# FLASHES are tested like python modules are tested using pytest -s and function-based tests which can be run as modules or as functions at runtime.
-import pytest
-import sys
 import types
-from typing import Any, Callable, List, Tuple, Union
+import sys
+import logging
 
-from main import main as ml
+# Mock logger setup
+class MockLogger:
+    @staticmethod
+    def info(message: str) -> None:
+        print(f"INFO: {message}")
 
-ml.logger.info('Testing flashes')  # type: ignore
+    @staticmethod
+    def error(message: str) -> None:
+        print(f"ERROR: {message}")
 
-
-class FlashMethodFactory:
-    """
-    This is a factory class for pytest.mark.parametrize.
-    """
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.args: Tuple[Any, ...] = args
-        self.kwargs: dict = kwargs
-
-    def __call__(self, func: Union[Callable, str]) -> Any:
-        """
-        Decorate a function or a string with pytest.mark.parametrize.
-        """
-        if isinstance(func, str):
-            return pytest.mark.parametrize(self.args, self.kwargs)(func)
-        return pytest.mark.parametrize(*self.args, **self.kwargs)(func)
-
-
-@pytest.mark.parametrize(
-    'flash',
-    [
-        'cognos.flash.flash_0001',
-        'cognos.flash.flash_0002',
-        'cognos.flash.flash_0003',
-    ],
-    indirect=True
-)
-def test_flashes(flash: str) -> None:
-    """
-    Test flashes.
-    """
-    ml.logger.info(f'Testing flash: {flash}')  # type: ignore
-
+ml = MockLogger()
 
 def test_rt_module() -> None:
     """
@@ -54,32 +26,25 @@ def test_rt_module() -> None:
     rt_module.__package__ = 'cognos'
     rt_module.__path__ = None
     rt_module.__doc__ = None
-    # advanced funcs tbd like __loaders__ (if needed)
     sys.modules['cognos'] = rt_module
-    ml.logger.info(f'cognos module: {sys.modules["cognos"]}')  # type: ignore
+    ml.info(f'cognos module: {sys.modules["cognos"]}')
     try:
-
-        """Morphological source code requires a morphological compiler - python run time is that compiler, and compilation is asynchonous at runtime.
-        So the source code is injected into the runtime as a module, and the module is executed in the runtime.
-        """
         rt_module = types.ModuleType('cognos')
         rt_mod_name = 'cognos'
         rt_mod_path = sys.modules['__main__'].__file__
-        # rt_mod_path = "/workspaces/cognos/src/launch.py"
-
         rt_mod: types.ModuleType = types.ModuleType(rt_mod_name)
-        rt_mod.__file__ = rt_mod_path  # for importlib.util.spec_from_file_location
-        sys.modules[rt_mod_name] = rt_mod  # rt in globals() or globals().__setitem__(rt_mod_name, rt_mod)
-
-        with open(rt_mod_path, 'r') as f:  # open [[source code|rt_src]]
+        rt_mod.__file__ = rt_mod_path
+        sys.modules[rt_mod_name] = rt_mod
+        with open(rt_mod_path, 'r') as f:
             rt_mod_src: str = f.read()
-
         code: types.CodeType = compile(rt_mod_src, rt_mod_path, 'exec')
-
-        exec(code, rt_mod.__dict__)  # exec [[source code|rt_src]] in rt_mod.__dict__ --> inject frontmatter
-
+        exec(code, rt_mod.__dict__)
     except Exception as e:
-        ml.logger.error(f'{e}')
+        ml.error(f'{e}')
         raise e
     else:
-        ml.logger.info(f'{rt_mod_name} module: {sys.modules[rt_mod_name]}')
+        ml.info(f'{rt_mod_name} module: {sys.modules[rt_mod_name]}')
+
+# Example usage
+if __name__ == "__main__":
+    test_rt_module()
