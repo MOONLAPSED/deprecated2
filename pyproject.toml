@@ -9,6 +9,8 @@ authors = [{ name = "MOONLAPSED", email = "MOONLAPSED@gmail.com" }]
 version = "0.1.0"
 requires-python = ">=3.11"
 
+dependencies = ["lager @ git+https://github.com/MOONLAPSED/lager.git@main"]
+
 [project.readme]
 file = "README.md"
 content-type = "text/markdown"
@@ -19,7 +21,7 @@ channels = ["conda-forge/noarch", "conda-forge", "anaconda"]
 dependencies = ["jax", "httpx", "lager @ git+https://github.com/MOONLAPSED/lager.git@main"]
 as-default-manager = true
 solver = "libmamba"
-excludes = ["pytest-cov"]  # Don't install with conda even if it's a dependency from other packages
+excludes = ["pytest-cov"]  # don't install with conda even if it's a dependency from other packages
 installation-method = "copy"
 batched-commands = true
 
@@ -28,10 +30,10 @@ download-dir = "/tmp"
 url = "https://url/to/mapping.yaml"
 
 [tool.pdm.conda.optional-dependencies]
-extra = ["anaconda:ffmpeg", "anaconda::xonsh", "anaconda::pdm", "anaconda::jupyter", "anaconda::ipykernel", "anaconda::numpy", "anaconda::ipykernel"]
+extra = ["anaconda:ffmpeg", "anaconda::xonsh", "anaconda::pdm", "anaconda::jupyter", "anaconda::ipykernel", "anaconda::numpy", "anaconda::mypy", "anaconda::ipykernel"]
 
 [tool.pdm.conda.dev-dependencies]
-dev = ["pytest", "mypy", "pytest-cov", "black", "flake8", "pdm-pep517", "pdm-pep517-build-backend", "isort", "tox", "pre-commit", "cffi", "gcc", "cmake", "ctags"]
+dev = ["pytest", "mypy", "pytest-cov", "black", "flake8", "pdm-pep517", "pdm-pep517-build-backend"]
 
 [project.scripts]
 main = "main.py:main"
