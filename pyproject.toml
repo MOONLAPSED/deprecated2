@@ -1,39 +1,35 @@
+[project]
+name = "cognos"
+version = "0.1.1"
+description = "cognos, part of the cognosis project"
+authors = [{name = "MOONLAPSED", email = "MOONLAPSED@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "mypy",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "pdm-pep517",
+    "pdm-pep517-build-backend",
+    "isort",
+    "tox",
+    "pre-commit",
+    "cffi",
+    "gcc",
+    "cmake",
+    "ctags",
+    "pytest-benchmark",
+    "hypothesis",
+    "pdm",
+    "mamba",
+    "micromamba"
+]
+
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[project]
-name = "cognos"
-description = "cognOS for cognosis, namespace and filesystem interface; obsidian kb"
-authors = [{ name = "MOONLAPSED", email = "MOONLAPSED@gmail.com" }]
-version = "0.1.0"
-requires-python = ">=3.11"
-
-dependencies = ["lager @ git+https://github.com/MOONLAPSED/lager.git@main"]
-
-[project.readme]
-file = "README.md"
-content-type = "text/markdown"
-
-[tool.pdm.conda]
-runner = "micromamba"
-channels = ["conda-forge/noarch", "conda-forge", "anaconda"]
-dependencies = ["jax", "httpx", "lager @ git+https://github.com/MOONLAPSED/lager.git@v1.0.0"]
-as-default-manager = true
-solver = "libmamba"
-excludes = ["pytest-cov"]  # don't install with conda even if it's a dependency from other packages
-installation-method = "copy"
-batched-commands = true
-
-[tool.pdm.conda.pypi-mapping]
-download-dir = "/tmp"
-url = "https://url/to/mapping.yaml"
-
-[tool.pdm.conda.optional-dependencies]
-extra = ["anaconda:ffmpeg", "anaconda::xonsh", "anaconda::pdm", "anaconda::jupyter", "anaconda::ipykernel", "anaconda::numpy", "anaconda::mypy", "anaconda::ipykernel"]
-
-[tool.pdm.conda.dev-dependencies]
-dev = ["pytest", "mypy", "pytest-cov", "black", "flake8", "pdm-pep517", "pdm-pep517-build-backend", "isort", "tox", "pre-commit", "cffi", "gcc", "cmake", "ctags"]
-
-[project.scripts]
-main = "main.py:main"
