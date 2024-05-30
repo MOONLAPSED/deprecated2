@@ -1,11 +1,17 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
 [project]
 name = "cognos"
-version = "0.1.1"
-description = "cognos, part of the cognosis project"
-authors = [{name = "MOONLAPSED", email = "MOONLAPSED@gmail.com"}]
-readme = "README.md"
+description = "Cognos, part of the Cognosis project"
+authors = [{ name = "Moonlapsed", email = "moonlapsed@gmail.com" }]
+version = "0.1.0"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
 
 [project.optional-dependencies]
 dev = [
@@ -30,6 +36,74 @@ dev = [
     "micromamba"
 ]
 
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.pdm.conda]
+runner = "micromamba"
+channels = ["conda-forge/noarch", "conda-forge", "anaconda"]
+dependencies = ["pdm", "jax", "openai", "pydantic", "httpx"]
+as-default-manager = true
+solver = "libmamba"
+excludes = ["pytest-cov"]
+installation-method = "copy"
+batched-commands = true
+
+[tool.pdm.conda.pypi-mapping]
+download-dir = "/tmp"
+url = "https://url/to/mapping.yaml"
+
+[tool.pdm.conda.optional-dependencies]
+extra = [
+    "anaconda:ffmpeg",
+    "anaconda::xonsh",
+    "anaconda::pdm",
+    "anaconda::jupyter",
+    "anaconda::ipykernel",
+    "anaconda::numpy",
+    "anaconda::mypy",
+    "anaconda::ipykernel",
+    "anaconda::xonsh"
+]
+
+[tool.pdm.conda.dev-dependencies]
+dev = [
+    "pytest",
+    "mypy",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "pdm-pep517",
+    "pdm-pep517-build-backend",
+    "isort",
+    "tox",
+    "pre-commit",
+    "cffi",
+    "gcc",
+    "cmake",
+    "ctags",
+    "pytest-benchmark",
+    "hypothesis"
+]
+
+[tool.black]
+line-length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+[tool.mypy]
+python_version = "3.11"
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[project.scripts]
+main = "main.py:main"
+bench = "src/bench/bench.py"
+
+[build]
+root-dir = "."
