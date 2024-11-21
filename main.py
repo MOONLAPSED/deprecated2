@@ -63,20 +63,13 @@ from io import StringIO
 import signal
 import errno
 import signal
-try:
-    from .__init__ import __all__
-    if not __all__:
-        __all__ = []
-    else:
-        __all__ += __file__
-except ImportError:
-    __all__ = []
-    __all__ += __file__
 IS_WINDOWS = os.name == 'nt'
 IS_POSIX = os.name == 'posix'
 profiler = cProfile.Profile()
 @lambda _: _()
 def FireFirst() -> None:
+    __all__ = []
+    __all__ += __file__
     profiler.enable()
     print(f'func you')
     return True
@@ -239,6 +232,53 @@ elif IS_POSIX:
             print(e)
         except Exception as e:
             print(e)
+
+def extract_profile_data(profile_str: str, filters: list[str] = None) -> list[tuple]:
+    """
+    Processes profiling data to return a list of tuples for runtime manipulation.
+    
+    Args:
+        profile_str (str): Raw profiling data as a string.
+        filters (list[str]): Strings to filter out from the profiling data.
+
+    Returns:
+        list[tuple]: Filtered profiling data as a list of tuples.
+    """
+    filters = filters or []
+    result = []
+    for line in profile_str.splitlines():
+        # Apply filters to skip unwanted lines
+        if any(f in line for f in filters):
+            continue
+        # Split the line into parts and make it a tuple
+        parts = re.split(r'\s{2,}', line.strip())  # Use regex for multi-space splits
+        if len(parts) > 1:  # Ensure it's a valid data line
+            result.append(tuple(parts))
+    return result
+
+def extract_and_filter_profile_data(profile_stream: StringIO, filters: List[str]) -> Tuple[str, ...]:
+    """
+    Extracts profiling data from a StringIO stream, filters out unwanted strings,
+    and returns the filtered result as a tuple.
+    
+    Args:
+        profile_stream (StringIO): The StringIO stream containing the profiling data.
+        filters (List[str]): List of substrings to filter out from the profile data.
+        
+    Returns:
+        Tuple[str, ...]: A tuple of filtered profiling lines.
+    """
+    profile_data = profile_stream.getvalue()
+    profile_lines = profile_data.splitlines()
+    
+    # Apply filters to exclude unwanted strings
+    filtered_lines = [
+        line for line in profile_lines
+        if all(f not in line for f in filters)
+    ]
+    
+    return tuple(filtered_lines)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num', type=int, default=10, help="Number of iterations")
@@ -256,17 +296,20 @@ def main():
     print(f'best of {args.num}: {best:.3f}s')
     return 0
 
-profiler.disable()
-# Extract profiling data
-s = StringIO()
-sortby = 'cumulative'
-ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
-ps.print_stats()
-profile_data = s.getvalue()
-profile_data = profile_data.replace('\\', '').replace('/', '')
-profile_data = profile_data.rstrip()
-print(profile_data)
-print('_' * 80)
-
 if __name__ == "__main__":
+    # Extract profiling data
+    s = StringIO()
+    sortby = 'cumulative'
+    ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
+    ps.print_stats()
+
+    # Filter and print the profiling data
+    filters = ["<frozen importlib._bootstrap_external>", "<frozen importlib"]
+    filtered_profile_data = extract_and_filter_profile_data(s, filters)
+    
+    print("\nFiltered Profiling Data:")
+    for line in filtered_profile_data:
+        print(line)
+    
+    print('_' * 80)
     sys.exit(main())
