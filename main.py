@@ -299,7 +299,7 @@ def main():
 if __name__ == "__main__":
     # Extract profiling data
     s = StringIO()
-    sortby = 'cumulative'
+    sortby = 'ncalls'
     ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
     ps.print_stats()
 
@@ -307,9 +307,11 @@ if __name__ == "__main__":
     filters = ["<frozen importlib._bootstrap_external>", "<frozen importlib"]
     filtered_profile_data = extract_and_filter_profile_data(s, filters)
     
+    
+    print('_' * 80)
+    main()
+    print('_' * 80)
     print("\nFiltered Profiling Data:")
     for line in filtered_profile_data:
         print(line)
-    
-    print('_' * 80)
-    sys.exit(main())
+    sys.exit()
