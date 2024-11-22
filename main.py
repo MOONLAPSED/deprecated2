@@ -1,6 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 #------------------------------------------------------------------------------
 # Standard Library Imports - 3.13 std libs **ONLY**
 #------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ import tracemalloc
 import http.server
 import collections
 from array import array
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from enum import Enum, auto
 from collections.abc import Iterable, Mapping
 from datetime import datetime
@@ -50,268 +51,292 @@ from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager, asynccontextmanager
 from importlib.util import spec_from_file_location, module_from_spec
-from types import SimpleNamespace, ModuleType,  MethodType, FunctionType, CodeType, TracebackType, FrameType
+from types import (
+    SimpleNamespace, ModuleType, MethodType, 
+    FunctionType, CodeType, TracebackType, FrameType
+)
 from typing import (
-    Any, Dict, List, Optional, Union, Callable, TypeVar, Tuple, Generic, Set,
-    Coroutine, Type, NamedTuple, ClassVar, Protocol, runtime_checkable, AsyncIterator
+    Any, Dict, List, Optional, Union, Callable, TypeVar, 
+    Tuple, Generic, Set, Coroutine, Type, NamedTuple, 
+    ClassVar, Protocol, runtime_checkable, AsyncIterator
 )
 import cProfile
 import pstats
-from threading import Thread
 import argparse
 from io import StringIO
 import signal
 import errno
-import signal
-IS_WINDOWS = os.name == 'nt'
-IS_POSIX = os.name == 'posix'
-profiler = cProfile.Profile()
-@lambda _: _()
-def FireFirst() -> None:
-    __all__ = []
-    __all__ += __file__
-    profiler.enable()
-    print(f'func you')
-    return True
-# fires as soon as python sees it.
-if IS_WINDOWS:
-    from ctypes import windll
-    from ctypes import wintypes
-    from ctypes.wintypes import HANDLE, DWORD, LPWSTR, LPVOID, BOOL
-    from pathlib import PureWindowsPath
-    def set_process_priority(priority: int):
-        windll.kernel32.SetPriorityClass(wintypes.HANDLE(-1), priority)
-    WINDOWS_SANDBOX_DEFAULT_DESKTOP = Path(PureWindowsPath(r'C:\Users\WDAGUtilityAccount\Desktop'))
-    set_process_priority(0x00000020)
-    def wread_stream(stream, queue):
-        """Read lines from a stream and push them to a queue."""
-        for line in iter(stream.readline, b''):
-            queue.put(line.decode())
-        stream.close()
-    def wrun_command(command, timeout=None, env=None):
-        """
-        Executes a command, capturing stdout and stderr with optional timeout.
-        Args:
-            command (list): Command and arguments as a list, e.g., ['cmd', '/c', 'dir']
-            timeout (float): Timeout in seconds for the command to execute
-            env (dict): Environment variables to set for the command
-        Returns:
-            tuple: stdout (str), stderr (str), exit_status (int)
-        """
-        # Start the subprocess
-        process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=False,  # Read binary streams
-            env=env
+@dataclass
+class ProjectConfig:
+    """Project configuration container"""
+    name: str
+    version: str
+    python_version: str
+    dependencies: List[str]
+    dev_dependencies: List[str] = field(default_factory=list)
+    ruff_config: Dict[str, Any] = field(default_factory=dict)
+    ffi_modules: List[str] = field(default_factory=list)
+    src_path: Path = Path("src")
+    tests_path: Path = Path("tests")
+
+class ProjectManager:
+    def __init__(self, root_dir: Union[str, Path]):
+        self.root_dir = Path(root_dir)
+        self.logger = self._setup_logging()
+        self.config = self._load_or_create_config()
+        self._ensure_directory_structure()
+    
+    def _setup_logging(self) -> logging.Logger:
+        logger = logging.getLogger(__name__)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
-        # Queues for communication
-        stdout_queue = Queue()
-        stderr_queue = Queue()
-        # Threads to read stdout and stderr
-        stdout_thread = Thread(target=wread_stream, args=(process.stdout, stdout_queue))
-        stderr_thread = Thread(target=wread_stream, args=(process.stderr, stderr_queue))
-        stdout_thread.start()
-        stderr_thread.start()
-        start_time = time.time()
-        try:
-            while True:
-                if timeout and (time.time() - start_time) > timeout:
-                    process.send_signal(signal.CTRL_BREAK_EVENT if os.name == 'nt' else signal.SIGKILL)
-                    raise TimeoutError(f"Command '{command[0]}' timed out after {timeout} seconds")
-                # Check if process has completed
-                ret_code = process.poll()
-                if ret_code is not None:
-                    break
-                time.sleep(0.01)  # Prevent busy-waiting
-        finally:
-            # Ensure threads finish
-            stdout_thread.join()
-            stderr_thread.join()
-            # Close the process
-            process.stdout.close()
-            process.stderr.close()
-        # Collect output from queues
-        stdout = ''.join(iter(lambda: stdout_queue.get_nowait() if not stdout_queue.empty() else '', ''))
-        stderr = ''.join(iter(lambda: stderr_queue.get_nowait() if not stderr_queue.empty() else '', ''))
-        return stdout, stderr, process.returncode
-    try:
-        stdout, stderr, status = wrun_command(['cmd', '/c', 'dir'], timeout=5)
-        print("STDOUT:", stdout)
-        print("STDERR:", stderr)
-        print("STATUS:", status, '\n', '_' * 80)
-    except TimeoutError as e:
-        print(e)
-    except Exception as e:
-        print(e)
-elif IS_POSIX:
-    import resource
-    import fcntl
-    def set_process_priority(priority: int):
-        try:
-            os.nice(priority)
-        except PermissionError:
-            print("Warning: Unable to set process priority. Running with default priority.")
-    def run_command(command, timeout=None, env=None):
-        """
-        Executes a command, capturing stdout and stderr with optional timeout.
-        Args:
-            command (list): Command and arguments as a list, e.g., ['ls', '-l']
-            timeout (float): Timeout in seconds for the command to execute
-            env (dict): Environment variables to set for the command
-        Returns:
-            tuple: stdout (str), stderr (str), exit_status (int)
-        """
-        r_stdout, w_stdout = os.pipe()
-        r_stderr, w_stderr = os.pipe()
-        pid = os.fork()
-        if pid == 0:  # Child process
-            os.close(r_stdout)
-            os.close(r_stderr)
-            os.dup2(w_stdout, 1)
-            os.dup2(w_stderr, 2)
-            os.close(w_stdout)
-            os.close(w_stderr)
-            # Execute the command with optional environment
-            try:
-                if env:
-                    os.execvpe(command[0], command, env)
-                else:
-                    os.execvp(command[0], command)
-            except Exception as e:
-                print(f"Execution failed: {e}", file=os.fdopen(2, 'w'))
-                os._exit(1)
-        else:  # Parent process
-            os.close(w_stdout)
-            os.close(w_stderr)
-            fcntl.fcntl(r_stdout, fcntl.F_SETFL, fcntl.fcntl(r_stdout, fcntl.F_GETFL) | os.O_NONBLOCK)
-            fcntl.fcntl(r_stderr, fcntl.F_SETFL, fcntl.fcntl(r_stderr, fcntl.F_GETFL) | os.O_NONBLOCK)
-            stdout_output = []
-            stderr_output = []
-            start_time = time.time()
-            try:
-                while True:
-                    if timeout and (time.time() - start_time) > timeout:
-                        os.kill(pid, signal.SIGKILL)
-                        raise TimeoutError(f"Command '{command[0]}' timed out after {timeout} seconds")
-                    # Read from stdout
-                    try:
-                        stdout_chunk = os.read(r_stdout, 4096)
-                        if stdout_chunk:
-                            stdout_output.append(stdout_chunk.decode())
-                    except OSError as e:
-                        if e.errno != errno.EAGAIN:
-                            raise
-                    # Read from stderr
-                    try:
-                        stderr_chunk = os.read(r_stderr, 4096)
-                        if stderr_chunk:
-                            stderr_output.append(stderr_chunk.decode())
-                    except OSError as e:
-                        if e.errno != errno.EAGAIN:
-                            raise
-                    # Check if child has exited
-                    pid_exit, status = os.waitpid(pid, os.WNOHANG)
-                    if pid_exit == pid:
-                        break
-                    time.sleep(0.01)  # Small sleep to avoid busy-waiting
-            finally:
-                os.close(r_stdout)
-                os.close(r_stderr)
-            # Convert output lists to strings
-            stdout = ''.join(stdout_output)
-            stderr = ''.join(stderr_output)
-            return stdout, stderr, os.WEXITSTATUS(status) if pid_exit == pid else -1
-        try:
-            stdout, stderr, status = run_command(['ls', '-l'], timeout=5)
-            print("STDOUT:", stdout)
-            print("STDERR:", stderr)
-            print("STATUS:", status, '\n', '_' * 80)
-        except TimeoutError as e:
-            print(e)
-        except Exception as e:
-            print(e)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        return logger
 
-def extract_profile_data(profile_str: str, filters: list[str] = None) -> list[tuple]:
-    """
-    Processes profiling data to return a list of tuples for runtime manipulation.
-    
-    Args:
-        profile_str (str): Raw profiling data as a string.
-        filters (list[str]): Strings to filter out from the profiling data.
-
-    Returns:
-        list[tuple]: Filtered profiling data as a list of tuples.
-    """
-    filters = filters or []
-    result = []
-    for line in profile_str.splitlines():
-        # Apply filters to skip unwanted lines
-        if any(f in line for f in filters):
-            continue
-        # Split the line into parts and make it a tuple
-        parts = re.split(r'\s{2,}', line.strip())  # Use regex for multi-space splits
-        if len(parts) > 1:  # Ensure it's a valid data line
-            result.append(tuple(parts))
-    return result
-
-def extract_and_filter_profile_data(profile_stream: StringIO, filters: List[str]) -> Tuple[str, ...]:
-    """
-    Extracts profiling data from a StringIO stream, filters out unwanted strings,
-    and returns the filtered result as a tuple.
-    
-    Args:
-        profile_stream (StringIO): The StringIO stream containing the profiling data.
-        filters (List[str]): List of substrings to filter out from the profile data.
+    def _load_or_create_config(self) -> ProjectConfig:
+        pyproject_path = self.root_dir / "pyproject.toml"
         
-    Returns:
-        Tuple[str, ...]: A tuple of filtered profiling lines.
-    """
-    profile_data = profile_stream.getvalue()
-    profile_lines = profile_data.splitlines()
-    
-    # Apply filters to exclude unwanted strings
-    filtered_lines = [
-        line for line in profile_lines
-        if all(f not in line for f in filters)
-    ]
-    
-    return tuple(filtered_lines)
+        if not pyproject_path.exists():
+            self.logger.info("No pyproject.toml found. Creating default configuration.")
+            config = ProjectConfig(
+                name=self.root_dir.name,
+                version="0.1.0",
+                python_version=">=3.13",
+                dependencies=["uvx>=0.1.0","uvx>=0.1.0"],
+                dev_dependencies=[
+                    "ruff>=0.3.0",
+                    "pytest>=8.0.0",
+                    "pytest-asyncio>=0.23.0"
+                ],
+                ruff_config={
+                    "line-length": 88,
+                    "target-version": "py313",
+                    "select": ["E", "F", "I", "N", "W"],
+                    "ignore": [],
+                    "fixable": ["A", "B", "C", "D", "E", "F", "I"]
+                },
+                ffi_modules=[]
+            )
+            self._write_pyproject_toml(config)
+            return config
+        
+        with open(pyproject_path, "rb") as f:
+            data = tomllib.load(f)
+        
+        return ProjectConfig(
+            name=data["project"]["name"],
+            version=data["project"]["version"],
+            python_version=data["project"]["requires-python"],
+            dependencies=data["project"].get("dependencies", []),
+            dev_dependencies=data["project"].get("dev-dependencies", []),
+            ruff_config=data.get("tool", {}).get("ruff", {}),
+            ffi_modules=data["project"].get("ffi-modules", []),
+            src_path=Path(data["project"].get("src-path", "src")),
+            tests_path=Path(data["project"].get("tests-path", "tests"))
+        )
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--num', type=int, default=10, help="Number of iterations")
-    parser.add_argument('cmd', nargs='+', help="Command to execute")
+    def _write_pyproject_toml(self, config: ProjectConfig):
+        data = {
+            "project": {
+                "name": config.name,
+                "version": config.version,
+                "requires-python": config.python_version,
+                "dependencies": config.dependencies,
+                "dev-dependencies": config.dev_dependencies,
+                "ffi-modules": config.ffi_modules,
+                "src-path": str(config.src_path),
+                "tests-path": str(config.tests_path)
+            },
+            "tool": {
+                "ruff": config.ruff_config
+            }
+        }
+        
+        with open(self.root_dir / "pyproject.toml", "w", encoding='utf-8') as f:
+            toml_str = tomllib.dumps(data)
+            f.write(toml_str)
+
+    def _ensure_directory_structure(self):
+        """Create necessary project directories if they don't exist"""
+        dirs = [
+            self.config.src_path,
+            self.config.tests_path,
+            self.config.src_path / "ffi"
+        ]
+        
+        for dir_path in dirs:
+            (self.root_dir / dir_path).mkdir(parents=True, exist_ok=True)
+            init_file = self.root_dir / dir_path / "__init__.py"
+            if not init_file.exists():
+                init_file.touch()
+
+    @contextmanager
+    def _temp_requirements(self, requirements: List[str]):
+        """Create a temporary requirements file"""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            f.write('\n'.join(requirements))
+            temp_path = f.name
+        try:
+            yield temp_path
+        finally:
+            os.unlink(temp_path)
+
+    async def run_uv_command(self, cmd: List[str], timeout: Optional[float] = None) -> subprocess.CompletedProcess:
+        """Run a UV command asynchronously with timeout support"""
+        self.logger.debug(f"Running UV command: {' '.join(cmd)}")
+        
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            
+            try:
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(),
+                    timeout=timeout
+                )
+            except asyncio.TimeoutError:
+                try:
+                    process.terminate()
+                    await process.wait()
+                except ProcessLookupError:
+                    pass
+                raise TimeoutError(f"Command timed out after {timeout} seconds")
+            
+            if process.returncode != 0:
+                error_msg = stderr.decode()
+                self.logger.error(f"UV command failed: {error_msg}")
+                raise RuntimeError(f"UV command failed: {error_msg}")
+            
+            return subprocess.CompletedProcess(
+                cmd, process.returncode, stdout.decode(), stderr.decode()
+            )
+            
+        except FileNotFoundError:
+            self.logger.error(f"Command not found: {cmd[0]}")
+            raise RuntimeError(f"Command not found: {cmd[0]}. Is UV installed?")
+
+    async def setup_environment(self):
+            """Set up the virtual environment and install dependencies"""
+            self.logger.info("Setting up UV environment...")
+            
+            # Create virtual environment
+            await self.run_uv_command(["uv", "venv"])
+            
+            # Create requirements files
+            requirements_path = self.root_dir / "requirements.txt"
+            dev_requirements_path = self.root_dir / "requirements-dev.txt"
+            
+            # Write main requirements
+            if self.config.dependencies:
+                with open(requirements_path, 'w') as f:
+                    f.write('\n'.join(self.config.dependencies) + '\n')
+            
+            # Write dev requirements
+            if self.config.dev_dependencies:
+                with open(dev_requirements_path, 'w') as f:
+                    f.write('\n'.join(self.config.dev_dependencies) + '\n')
+            
+            # Generate lock file for main requirements
+            if requirements_path.exists():
+                self.logger.info("Compiling requirements...")
+                await self.run_uv_command([
+                    "uv", "pip", "compile", 
+                    str(requirements_path), 
+                    "--output-file", 
+                    str(self.root_dir / "requirements.lock")
+                ])
+            
+            # Generate lock file for dev requirements
+            if dev_requirements_path.exists():
+                self.logger.info("Compiling dev requirements...")
+                await self.run_uv_command([
+                    "uv", "pip", "compile", 
+                    str(dev_requirements_path), 
+                    "--output-file", 
+                    str(self.root_dir / "requirements-dev.lock")
+                ])
+            
+            # Install from lock files
+            if (self.root_dir / "requirements.lock").exists():
+                self.logger.info("Installing dependencies from lock file...")
+                await self.run_uv_command([
+                    "uv", "pip", "install", 
+                    "-r", str(self.root_dir / "requirements.lock")
+                ])
+            
+            if (self.root_dir / "requirements-dev.lock").exists():
+                self.logger.info("Installing dev dependencies from lock file...")
+                await self.run_uv_command([
+                    "uv", "pip", "install", 
+                    "-r", str(self.root_dir / "requirements-dev.lock")
+                ])
+            
+            # Install the project in editable mode if setup.py exists
+            if (self.root_dir / "setup.py").exists():
+                self.logger.info("Installing project in editable mode...")
+                await self.run_uv_command(["uv", "pip", "install", "-e", "."])
+
+    async def run_app(self, module_path: str, *args, timeout: Optional[float] = None):
+        """Run the application using Python directly"""
+        module_path = str(Path(module_path))
+        cmd = ["python", module_path, *map(str, args)]
+        self.logger.info(f"Running: {' '.join(cmd)}")
+        return await self.run_uv_command(cmd, timeout=timeout)
+
+    async def run_tests(self):
+        """Run tests using pytest"""
+        await self.run_uv_command(["uvx", "run", "-m", "pytest", str(self.config.tests_path)])
+
+    async def run_linter(self):
+        """Run Ruff linter"""
+        await self.run_uv_command(["uvx", "run", "-m", "ruff", "check", "."])
+
+    async def format_code(self):
+        """Format code using Ruff"""
+        await self.run_uv_command(["uvx", "run", "-m", "ruff", "format", "."])
+
+async def main():
+    """Main entry point for the project manager"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="UV-based Project Manager")
+    parser.add_argument("--root", default=".", help="Project root directory")
+    parser.add_argument("command", choices=[
+        "setup", "run", "test", "lint", "format"
+    ], help="Command to execute")
+    parser.add_argument("args", nargs="*", help="Additional arguments")
+    parser.add_argument("--timeout", type=float, help="Timeout in seconds for commands")
+    
     args = parser.parse_args()
-    best: float = sys.maxsize
-    for _ in range(args.num):
-        t0 = time.monotonic()
-        subprocess.call(args.cmd)
-        t1 = time.monotonic()
-        best = min(best, t1 - t0)
-        print(f'{t1 - t0:.3f}s', end=' \n')
-        # appends the time to the platform-specific IF_POSIX/IF_WINDOWS code
-    print('_' * 80)
-    print(f'best of {args.num}: {best:.3f}s')
+    
+    manager = ProjectManager(args.root)
+    
+    try:
+        if args.command == "setup":
+            await manager.setup_environment()
+        elif args.command == "run":
+            if not args.args:
+                raise ValueError("Module path required for 'run' command")
+            await manager.run_app(args.args[0], *args.args[1:], timeout=args.timeout)
+        elif args.command == "test":
+            await manager.run_tests()
+        elif args.command == "lint":
+            await manager.run_linter()
+        elif args.command == "format":
+            await manager.format_code()
+    
+    except Exception as e:
+        manager.logger.error(f"Error: {e}")
+        return 1
+    
     return 0
 
 if __name__ == "__main__":
-    # Extract profiling data
-    s = StringIO()
-    sortby = 'ncalls'
-    ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
-    ps.print_stats()
-
-    # Filter and print the profiling data
-    filters = ["<frozen importlib._bootstrap_external>", "<frozen importlib"]
-    filtered_profile_data = extract_and_filter_profile_data(s, filters)
-    
-    
-    print('_' * 80)
-    main()
-    print('_' * 80)
-    print("\nFiltered Profiling Data:")
-    for line in filtered_profile_data:
-        print(line)
-    sys.exit()
+    sys.exit(asyncio.run(main()))
