@@ -4,10 +4,6 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = []
-dev-dependencies = []
-src-path = "src"
-ffi-modules = []
-profile-enabled = true
 
 [project.readme]
 file = "README.md"
@@ -17,24 +13,28 @@ content-type = "text/markdown"
 download-dir = "/tmp"
 url = "https://url/to/mapping.yaml"
 
-[project.platform-specific]
-priority = 32  # Windows: 0x00000020, POSIX: nice value
-
 [tool.black]
 line-length = 88
+
 [tool.flake8]
 max-line-length = 88
 extend-ignore = ["E203", "W503"]
+
 [tool.mypy]
 python_version = "3.11"
 disallow_untyped_defs = true
 ignore_missing_imports = true
+
 [tool.isort]
 profile = "black"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
 [project.scripts]
 main = "main.py:main"
 bench = "src/bench/bench.py"
-[build]
-root-dir = "."
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

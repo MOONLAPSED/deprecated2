@@ -84,8 +84,10 @@ class ProjectManager:
         self.root_dir = Path(root_dir)
         self.logger = self._setup_logging()
         self.config = self._load_or_create_config()
+        self.project_config = self._load_project_config()  # Load custom config
+        self.ffi_modules = self.project_config["ffi_modules"]  # Access FFI modules
         self._ensure_directory_structure()
-    
+
     def _setup_logging(self) -> logging.Logger:
         logger = logging.getLogger(__name__)
         handler = logging.StreamHandler()
@@ -96,6 +98,28 @@ class ProjectManager:
         logger.addHandler(handler)
         logger.setLevel(logging.INFO)
         return logger
+
+    def _load_project_config(self) -> Dict[str, Any]:
+        """Load project-specific configuration from demiurge.json"""
+        config_path = self.root_dir / "demiurge.json"
+        
+        default_config = {
+            "ffi_modules": [],
+            "src_path": "src",
+            "dev_dependencies": [],
+            "profile_enabled": True,
+            "platform_specific": {
+                "priority": 32
+            }
+        }
+        
+        if not config_path.exists():
+            with open(config_path, 'w') as f:
+                json.dump(default_config, f, indent=4)
+            return default_config
+            
+        with open(config_path) as f:
+            return json.load(f)
 
     def _load_or_create_config(self) -> ProjectConfig:
         pyproject_path = self.root_dir / "pyproject.toml"
