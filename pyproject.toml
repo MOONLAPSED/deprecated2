@@ -32,8 +32,7 @@ profile = "black"
 testpaths = ["tests"]
 
 [project.scripts]
-main = "main.py:main"
-bench = "src/bench/bench.py"
+main = "demiurge.main:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
