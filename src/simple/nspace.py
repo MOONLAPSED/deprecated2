@@ -1,7 +1,9 @@
-"""This provides a way to dynamically generate modules and inject code into them at runtime. This is useful for creating a module from a source code string or AST (or cognos tree), and then executing the module in the runtime.
-Runtime module (main) is the module that the source code is injected into | t_module is a tree of modules dynamically pulled from SimpleNamespace + dataclasses"""
+from __future__ import annotations
 import sys
 from types import ModuleType, SimpleNamespace
+"""This provides a way to dynamically generate modules and inject code into them at runtime. This is useful for creating a
+module from a source code string or AST and then executing the module in the runtime. Runtime module (main)
+is the module that the source code is injected into."""
 
 def create_module(module_name, module_code, main_module_path):
     """
@@ -37,7 +39,7 @@ def create_module(module_name, module_code, main_module_path):
 module_name = "cognos"
 module_code = """
 def greet():
-    print("Hello from cognos module!")
+    print("Hello from demiurge module!")
 """
 main_module_path = sys.modules['__main__'].__file__
 
